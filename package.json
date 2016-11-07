@@ -25,7 +25,7 @@
   "scripts": {
     "start": "npm run test:watch",
     "test": "cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
-    "test:watch": "chokidar src test  bin-c 'npm test'",
+    "test:watch": "chokidar src test  bin 'npm test'",
     "build": "npm run clean && babel src -d lib",
     "clean": "rimraf lib/*",
     "commit": "git-cz",
