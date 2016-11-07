@@ -1,5 +1,5 @@
 'use strict'
 
-export default function addTwoNumbers (a, b) {
-  return a + b
+export default function priceCsvParser () {
+  return 'method'
 }
