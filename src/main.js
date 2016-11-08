@@ -50,7 +50,17 @@ export default class PriceCsvParser {
       .through(csv())
       .doto(() => rowIndex += 1)
       .map(unflatten)
-      .flatMap(data => highland(this.processData(data)))
+      .flatMap(x => {
+        return highland(Promise.resolve(x.customField))
+          .map(customField => ({customField: 'hey'}))
+          // .collect()
+          // .map(users => ({users: users}))
+          .map(highland.extend(x));
+      })
+      // .map((x) => {
+      //   // return x;
+      //   return highland.flip(addCustom)(x);
+      // })
       // .map((a)addCustom)
       // .flatMap(data => highland(this.processCustomFields(data)))
       .pipe(StringifyStream())
