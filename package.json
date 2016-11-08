@@ -25,7 +25,7 @@
   "scripts": {
     "start": "npm run test:watch",
     "test": "cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
-    "test:watch": "chokidar src test  bin 'npm test'",
+    "test:watch": "chokidar src test  bin -c 'npm test'",
     "build": "npm run clean && babel src -d lib",
     "clean": "rimraf lib/*",
     "commit": "git-cz",
@@ -48,7 +48,9 @@
     "settings": {
       "import/resolver": {
         "node": {
-          "paths": ["src/"]
+          "paths": [
+            "src/"
+          ]
         }
       }
     }
@@ -86,5 +88,19 @@
     ],
     "sourceMap": false,
     "instrument": false
+  },
+  "dependencies": {
+    "JSONStream": "^1.2.1",
+    "bluebird": "^3.4.6",
+    "csv-parser": "^1.11.0",
+    "flat": "^2.0.1",
+    "highland": "^2.10.1",
+    "lodash": "^4.16.6",
+    "lodash.memoize": "^4.1.2",
+    "sphere-node-sdk": "^1.16.0",
+    "sphere-node-utils": "^0.8.6",
+    "stream-transform": "^0.1.1",
+    "underscore": "^1.8.3",
+    "underscore-mixins": "^0.1.4"
   }
 }
