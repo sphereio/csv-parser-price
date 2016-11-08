@@ -8,9 +8,13 @@ import transform from 'stream-transform'
 import { SphereClient } from 'sphere-node-sdk'
 import CONS from './constants'
 
+const logit = function (data) {
+  console.log(JSON.stringify(data, null, 4));
+}
+
 var stream = require('stream'),
     util = require('util');
-let count = 0
+
 function StringifyStream(options) {
   if (!(this instanceof StringifyStream))
     return new StringifyStream(options);
@@ -24,12 +28,11 @@ function StringifyStream(options) {
 util.inherits(StringifyStream, stream.Transform)
 
 StringifyStream.prototype._transform = function(d,e,callback) {
-  console.log()
-  console.log()
-  console.log(count++)
   this.push(JSON.stringify(d,null,2));
   callback();
 };
+
+const addCustom = highland.extend({custom: 'THIS IS REALLY CUSTOM'});
 
 export default class PriceCsvParser {
   constructor (logger, { sphereClientConfig = {} }) {
@@ -41,15 +44,17 @@ export default class PriceCsvParser {
   }
 
   parse (filePath) {
-    let count = 1
-    highland(
-      fs.createReadStream(filePath, { encoding: this.encoding })
-    )
-    .through(csv())
-    .map(data => unflatten(data))
-    .flatMap(data => highland(this.processData(data)))
-    .pipe(StringifyStream())
-    .pipe(process.stdout)
+    let rowIndex = 1
+
+    highland(fs.createReadStream(filePath, { encoding: this.encoding }))
+      .through(csv())
+      .doto(() => rowIndex += 1)
+      .map(unflatten)
+      .flatMap(data => highland(this.processData(data)))
+      // .map((a)addCustom)
+      // .flatMap(data => highland(this.processCustomFields(data)))
+      .pipe(StringifyStream())
+      .pipe(process.stdout)
     // .on('data', function(err, data) {
     //   console.log(err, count++)
     // })
@@ -75,10 +80,16 @@ export default class PriceCsvParser {
     return _.memoize(this.client.type.byKey(customTypeKey).fetch())
   }
 
-  mapData (data) {
-    const price = data
-    price.value.centAmount = parseInt(price.value.centAmount, 10)
+  processCustomFields (data) {
+    logit(data);
+    this.getCustomTypeDefinition(data.prices[0].customType).then((result) => {
+      const customTypeDefinition = result.body
+      this.mapCustomFields(price)
+      // highland.extend({custom: })
+    })
+  }
 
+  mapData (data) {
     this.getCustomTypeDefinition(price.customType).then((result) => {
       const customTypeDefinition = result.body
       this.mapCustomFields(price)
@@ -104,6 +115,8 @@ export default class PriceCsvParser {
       },
       fields: {},
     }
+    console.log('price', price);
+    console.log('customType', customType);
     _.each(price.customField, (value, key) => {
       _.each(customType.fieldDefinitions, (fieldDefinition) => {
         if (fieldDefinition.name === key) {
@@ -116,9 +129,4 @@ export default class PriceCsvParser {
       })
     })
   }
-}
-
-
-function mapCustomFields (data) {
-
 }
