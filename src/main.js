@@ -2,15 +2,14 @@ import fs from 'fs'
 import stream from 'stream'
 import util from 'util'
 
-import _ from 'lodash'
+import _ from 'underscore'
 import csv from 'csv-parser'
 import { unflatten } from 'flat'
 import highland from 'highland'
-import JSONStream from 'JSONStream'
 import { SphereClient } from 'sphere-node-sdk'
-import transform from 'stream-transform'
 
 import CONS from './constants'
+import MapCustomFields from './mapCustomFields'
 
 function StringifyStream (options) {
   if (!(this instanceof StringifyStream))
@@ -33,6 +32,7 @@ export default class PriceCsvParser {
     this.logger = logger
     this.encoding = 'utf-8'
     this.batchProcessing = '10'
+    this.mapCustomFields = MapCustomFields()
     this.error = []
   }
 
@@ -43,28 +43,40 @@ export default class PriceCsvParser {
       .through(csv())
       .doto(() => rowIndex += 1)
       .map(unflatten)
+      .flatMap(data => highland(this.processData(data, rowIndex)))
+      .stopOnError(e => console.log(e, '======='))
       .pipe(StringifyStream())
       .pipe(process.stdout)
   }
 
-  processData (data) {
-    return new Promise((resolve, reject) => {
+  processData (data, rowIndex) {
+    const _data = _.clone(data)
+    return new Promise((resolve) => {
       const price = {
-        sku: data[CONS.HEADER_SKU],
-        prices: [data],
+        sku: _data[CONS.HEADER_SKU],
       }
-      resolve(price)
+
+      this.processCustomFields(data, rowIndex).then((customTypeObj) => {
+        _data.custom = customTypeObj
+        price.prices = [_data]
+        resolve(price)
+      })
     })
   }
 
-  static getCustomTypeDefinition (customTypeKey) {
-    return _.memoize(this.client.type.byKey(customTypeKey).fetch())
+  getCustomTypeDefinition (customTypeKey) {
+    return this.client.types.byKey(customTypeKey).fetch()
   }
 
-  processCustomFields (data) {
-    this.getCustomTypeDefinition(price.customType).then((result) => {
+  processCustomFields (data, rowIndex) {
+    return this.getCustomTypeDefinition(data.customType).then((result) => {
       const customTypeDefinition = result.body
-      this.mapCustomFields(price)
+      const customTypeObj = this.mapCustomFields.parse(
+        data.customField, customTypeDefinition, rowIndex
+      )
+      if (customTypeObj.error.length)
+        return Promise.reject(customTypeObj.error)
+      return customTypeObj.data
     })
   }
 }
