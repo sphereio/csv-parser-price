@@ -26,7 +26,8 @@
     "start": "npm run test:watch",
     "test": "cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
     "test:watch": "chokidar src test bin -c 'npm test'",
-    "build": "npm run clean && babel src -d lib",
+    "build": "babel src bin -d lib",
+    "takeoff": "cross-env NODE_ENV=test NODE_PATH=./src chokidar src bin -c 'npm run build && sudo chmod +x ./lib/csvparserprice.js && cat output.csv | ./lib/csvparserprice.js'",
     "clean": "rimraf lib/*",
     "commit": "git-cz",
     "codecov": "cat ./coverage/lcov.info | codecov",
@@ -90,6 +91,7 @@
     "instrument": false
   },
   "dependencies": {
+    "args": "^2.1.0",
     "bluebird": "^3.4.6",
     "csv-parser": "^1.11.0",
     "flat": "^2.0.1",
