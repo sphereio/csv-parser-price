@@ -1,38 +1,31 @@
 import fs from 'fs'
-import csv from 'csv-parser'
-import JSONStream from 'JSONStream'
-import highland from 'highland'
+import stream from 'stream'
+import util from 'util'
+
 import _ from 'lodash'
+import csv from 'csv-parser'
 import { unflatten } from 'flat'
-import transform from 'stream-transform'
+import highland from 'highland'
+import JSONStream from 'JSONStream'
 import { SphereClient } from 'sphere-node-sdk'
+import transform from 'stream-transform'
+
 import CONS from './constants'
 
-const logit = function (data) {
-  console.log(JSON.stringify(data, null, 4));
-}
-
-var stream = require('stream'),
-    util = require('util');
-
-function StringifyStream(options) {
+function StringifyStream (options) {
   if (!(this instanceof StringifyStream))
-    return new StringifyStream(options);
+    return new StringifyStream(options)
 
-  options = options || {};
-  options.objectMode = true;
+  options = options || {}
+  options.objectMode = true
 
-  stream.Transform.call(this,options);
+  stream.Transform.call(this, options)
 }
-
 util.inherits(StringifyStream, stream.Transform)
-
-StringifyStream.prototype._transform = function(d,e,callback) {
-  this.push(JSON.stringify(d,null,2));
-  callback();
-};
-
-const addCustom = highland.extend({custom: 'THIS IS REALLY CUSTOM'});
+StringifyStream.prototype._transform = function (data, error, callback) {
+  this.push(JSON.stringify(data, null, 2))
+  callback()
+}
 
 export default class PriceCsvParser {
   constructor (logger, { sphereClientConfig = {} }) {
@@ -50,30 +43,8 @@ export default class PriceCsvParser {
       .through(csv())
       .doto(() => rowIndex += 1)
       .map(unflatten)
-      .flatMap(x => {
-        return highland(Promise.resolve(x.customField))
-          .map(customField => ({customField: 'hey'}))
-          // .collect()
-          // .map(users => ({users: users}))
-          .map(highland.extend(x));
-      })
-      // .map((x) => {
-      //   // return x;
-      //   return highland.flip(addCustom)(x);
-      // })
-      // .map((a)addCustom)
-      // .flatMap(data => highland(this.processCustomFields(data)))
       .pipe(StringifyStream())
       .pipe(process.stdout)
-    // .on('data', function(err, data) {
-    //   console.log(err, count++)
-    // })
-    // highland(
-    // )
-    // .batch(this.batchProcessing)
-    // .pipe(transform((chunk, cb) => {
-    //   return this.processData(chunk, cb)
-    // }, { parallel: 1 }))
   }
 
   processData (data) {
@@ -91,52 +62,9 @@ export default class PriceCsvParser {
   }
 
   processCustomFields (data) {
-    logit(data);
-    this.getCustomTypeDefinition(data.prices[0].customType).then((result) => {
-      const customTypeDefinition = result.body
-      this.mapCustomFields(price)
-      // highland.extend({custom: })
-    })
-  }
-
-  mapData (data) {
     this.getCustomTypeDefinition(price.customType).then((result) => {
       const customTypeDefinition = result.body
       this.mapCustomFields(price)
-    })
-  }
-
-  // mapFieldTypes: ({fieldDefinitions, typeDefinitionKey, rowIndex, key, value, langHeader}) ->
-  //   result = undefined
-  //   _.each fieldDefinitions, (fieldDefinition) =>
-  //     if fieldDefinition.name is key
-  //       switch fieldDefinition.type.name
-  //         when 'Number' then result = @mapNumber value,typeDefinitionKey,rowIndex
-  //         when 'Boolean' then result = @mapBoolean value,typeDefinitionKey,rowIndex
-  //         when 'Money' then result = @mapMoney value,typeDefinitionKey,rowIndex
-  //         when 'LocalizedString' then result = @mapLocalizedString value, typeDefinitionKey, rowIndex,langHeader
-  //         when 'Set' then result = @mapSet value,typeDefinitionKey,rowIndex,fieldDefinition.type.elementType
-  //         else result = value
-  //   result
-  mapCustomFields (price, customType) {
-    price.custom = {
-      type: {
-        id: customType.id,
-      },
-      fields: {},
-    }
-    console.log('price', price);
-    console.log('customType', customType);
-    _.each(price.customField, (value, key) => {
-      _.each(customType.fieldDefinitions, (fieldDefinition) => {
-        if (fieldDefinition.name === key) {
-          switch (fieldDefinition.type.name) {
-            case 'Number':
-              price.custom.fields[key] = parseInt()
-              break;
-          }
-        }
-      })
     })
   }
 }

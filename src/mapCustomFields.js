@@ -34,41 +34,41 @@ export default function MapCustomFields () {
                 const _result = this.mapNumber(value)
                 if (_result.error)
                   result.error.push(
-                    `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
-                  )
+                      `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
+                    )
                 if (!_.isUndefined(_result.data))
                   custom.fields[key] = _result.data
-                return
+                break
               }
               case 'Boolean': {
                 const _result = this.mapBoolean(value)
                 if (_result.error)
                   result.error.push(
-                    `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
-                  )
+                      `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
+                    )
                 if (!_.isUndefined(_result.data))
                   custom.fields[key] = _result.data
-                return
+                break
               }
               case 'Money': {
                 const _result = this.mapMoney(value)
                 if (_result.error)
                   result.error.push(
-                    `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
-                  )
+                      `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
+                    )
                 if (!_.isUndefined(_result.data))
                   custom.fields[key] = _result.data
-                return
+                break
               }
               case 'Set': {
                 const _result = this.mapSet(value, fieldDef.type.elementType)
                 if (_result.error.length)
                   result.error.push(
-                    ...processError(_result.error, rowIndex, customType.key)
-                  )
+                      ...processError(_result.error, rowIndex, customType.key)
+                    )
                 if (_result.data.length)
                   custom.fields[key] = _result.data
-                return
+                break
               }
               case 'String':
               case 'Enum':
@@ -80,15 +80,15 @@ export default function MapCustomFields () {
               case 'Reference': {
                 if (!_.isUndefined(value))
                   custom.fields[key] = value
-                return
+                break
               }
               default: {
                 const unsupportedMsg = `'${
-                  fieldDef.type.name
-                }' type is not supported! Kindly raise an issue for this`
+                    fieldDef.type.name
+                  }' type is not supported! Kindly raise an issue for this`
                 result.error.push(
-                  `[row ${rowIndex}: ${customType.key}] - ${unsupportedMsg}`
-                )
+                    `[row ${rowIndex}: ${customType.key}] - ${unsupportedMsg}`
+                  )
               }
             }
         })
@@ -169,8 +169,8 @@ export default function MapCustomFields () {
           }
           default: {
             const unsupportedMsg = `'${
-              elementType.name
-            }' type is not supported! Kindly raise an issue for this`
+                elementType.name
+              }' type is not supported! Kindly raise an issue for this`
             return {
               error: unsupportedMsg,
             }
