@@ -2,14 +2,12 @@ import test from 'tape'
 import { SphereClient } from 'sphere-node-sdk'
 import PriceCsvParser from 'main'
 
-/* eslint-disable no-console */
 const logger = {
-  trace: console.log,
-  debug: console.log,
-  info: console.log,
-  error: console.error,
+  trace: process.stdout,
+  debug: process.stdout,
+  info: process.stdout,
+  error: process.stderr,
 }
-/* eslint-enable no-console */
 
 let PROJECT_KEY
 
