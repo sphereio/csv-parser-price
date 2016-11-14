@@ -11,21 +11,6 @@ import { SphereClient } from 'sphere-node-sdk'
 import CONS from './constants'
 import MapCustomFields from './mapCustomFields'
 
-function StringifyStream (options) {
-  if (!(this instanceof StringifyStream))
-    return new StringifyStream(options)
-
-  options = options || {}
-  options.objectMode = true
-
-  stream.Transform.call(this, options)
-}
-util.inherits(StringifyStream, stream.Transform)
-StringifyStream.prototype._transform = function (data, error, callback) {
-  this.push(JSON.stringify(data, null, 2))
-  callback()
-}
-
 export default class PriceCsvParser {
   constructor (logger, { sphereClientConfig = {} }) {
     this.client = new SphereClient(sphereClientConfig)
@@ -36,17 +21,18 @@ export default class PriceCsvParser {
     this.error = []
   }
 
-  parse (filePath) {
+  parse (input, output) {
     let rowIndex = 1
 
-    highland(fs.createReadStream(filePath, { encoding: this.encoding }))
+    highland(input)
       .through(csv())
       .doto(() => rowIndex += 1)
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
-      .stopOnError(e => console.log(e, '======='))
-      .pipe(StringifyStream())
-      .pipe(process.stdout)
+      // .stopOnError(e => console.log(e, '======='))
+      .map(data => JSON.stringify(data, null, 2))
+      // .doto(console.log)
+      .pipe(output)
   }
 
   processData (data, rowIndex) {
