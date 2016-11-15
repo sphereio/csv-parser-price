@@ -9,20 +9,23 @@ import CONS from './constants'
 import MapCustomFields from './mapCustomFields'
 
 export default class PriceCsvParser {
-  constructor (logger, { sphereClientConfig = {} }) {
+  constructor (logger, { sphereClientConfig = {} }, config) {
     this.client = new SphereClient(sphereClientConfig)
     this.logger = logger
     this.encoding = 'utf-8'
     this.batchProcessing = '10'
     this.mapCustomFields = MapCustomFields()
     this.error = []
+    this.config = config
   }
 
   parse (input, output) {
     let rowIndex = 1
 
     highland(input)
-      .through(csv())
+      .through(csv({
+        separator: this.config.delimiter || CONS.standards.delimiter,
+      }))
       .doto(() => (rowIndex += 1))
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))

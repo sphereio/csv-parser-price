@@ -3,6 +3,7 @@
 import fs from 'fs'
 import cli from 'args'
 
+import CONS from './constants'
 import getApiCredentials from './get-api-credentials'
 import PriceCsvParser from './main'
 
@@ -33,7 +34,8 @@ const args = cli
   )
   .option(
     'delimiter',
-    'The delimiter that is used in the csv.'
+    'The delimiter that is used in the csv.',
+    CONS.standards.delimiter
   )
   .option(
     'host',
@@ -59,11 +61,13 @@ const priceCsvParser = new PriceCsvParser(
   {
     sphereClientConfig: {
       config: getApiCredentials(),
-      delimiter: args.delimiter,
       host: args.host,
       protocol: args.protocol,
       access_token: args.accessToken,
     },
+  },
+  {
+    delimiter: args.delimiter,
   }
 )
 
