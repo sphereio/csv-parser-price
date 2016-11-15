@@ -1,7 +1,5 @@
 import fs from 'fs'
-import stream from 'stream'
-import util from 'util'
-
+import JSONStream from 'JSONStream'
 import _ from 'underscore'
 import csv from 'csv-parser'
 import { unflatten } from 'flat'
@@ -26,12 +24,10 @@ export default class PriceCsvParser {
 
     highland(input)
       .through(csv())
-      .doto(() => rowIndex += 1)
+      .doto(() => (rowIndex += 1))
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
-      // .stopOnError(e => console.log(e, '======='))
-      .map(data => JSON.stringify(data, null, 2))
-      // .doto(console.log)
+      .pipe(JSONStream.stringify('"prices" = [\n', '\n,\n', '\n]\n'))
       .pipe(output)
   }
 
@@ -40,13 +36,19 @@ export default class PriceCsvParser {
     return new Promise((resolve) => {
       const price = {
         sku: _data[CONS.HEADER_SKU],
+        prices: [_data],
       }
 
-      this.processCustomFields(data, rowIndex).then((customTypeObj) => {
-        _data.custom = customTypeObj
-        price.prices = [_data]
-        resolve(price)
-      })
+      if (data.customType)
+        return this.processCustomFields(
+          data,
+          rowIndex
+        ).then((customTypeObj) => {
+          _data.custom = customTypeObj
+          price.prices = [_data]
+          resolve(price)
+        })
+      return resolve(price)
     })
   }
 
