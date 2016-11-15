@@ -30,3 +30,10 @@ test('CLI takes input from file', (t) => {
     t.end()
   })
 })
+
+test('CLI returns error given a non-existant input file', (t) => {
+  exec('csvparserprice -i nope.csv', (error) => {
+    t.true(error, 'returns error')
+    t.end()
+  })
+})
