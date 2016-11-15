@@ -19,8 +19,9 @@ export default class PriceCsvParser {
     this.config = config
   }
 
-  parse (input, output) {
+  parse (input, output, errors) {
     let rowIndex = 1
+    errors.write('hey')
 
     highland(input)
       .through(csv({

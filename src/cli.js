@@ -71,5 +71,4 @@ const priceCsvParser = new PriceCsvParser(
   }
 )
 
-// process.stderr.write('swj')
-priceCsvParser.parse(args.inputFile, args.outputFile)
+priceCsvParser.parse(args.inputFile, args.outputFile, process.stderr)
