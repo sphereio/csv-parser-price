@@ -96,6 +96,7 @@
     "csv-parser": "^1.11.0",
     "flat": "^2.0.1",
     "highland": "^2.10.1",
+    "sinon": "^1.17.6",
     "sphere-node-sdk": "^1.16.0",
     "sphere-node-utils": "^0.8.6",
     "underscore": "^1.8.3",
