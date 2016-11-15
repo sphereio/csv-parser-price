@@ -1,5 +1,8 @@
 import test from 'tape'
 import sinon from 'sinon'
+import StreamTest from 'streamtest'
+import fs from 'fs'
+import path from 'path'
 import { SphereClient } from 'sphere-node-sdk'
 import PriceCsvParser from 'main'
 import { mockPriceObj, mockCustomTypeDef } from './helpers/mockData'
@@ -62,12 +65,27 @@ test(`PriceCsvParser
   t.end()
 })
 
-// test(`PriceCsvParser
-//   should parse csv file`, (t) => {
-//   const priceCsvParser = new PriceCsvParser(logger, options)
-//   priceCsvParser.parse('output.csv')
-//   t.end()
-// })
+test(`PriceCsvParser
+  should throw when options is invalid`, (t) => {
+  // eslint-disable-next-line no-new
+  t.throws(() => { new PriceCsvParser(logger, {}) })
+  t.end()
+})
+
+test(`PriceCsvParser::parse
+  should accept a stream and output a stream`, (t) => {
+  const priceCsvParser = new PriceCsvParser(logger, options)
+  const readStream = fs.createReadStream(
+    path.join(__dirname, 'helpers/sample.csv')
+  )
+  const outputStream = StreamTest['v2'].toText((err, result) => {
+    const prices = JSON.parse(result).prices
+    t.equal(prices.length, 2, 'All prices from the csv is parsed')
+    t.ok(prices[0].sku, 'Sku exists on price object')
+    t.end()
+  })
+  priceCsvParser.parse(readStream, outputStream)
+})
 
 test(`PriceCsvParser::processData
   should process object and build valid price object`, (t) => {

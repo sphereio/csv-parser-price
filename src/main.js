@@ -26,7 +26,7 @@ export default class PriceCsvParser {
       .doto(() => (rowIndex += 1))
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
-      .pipe(JSONStream.stringify('"prices" = [\n', '\n,\n', '\n]\n'))
+      .pipe(JSONStream.stringify('{ "prices": [\n', '\n,\n', '\n]}\n'))
       .pipe(output)
   }
 
