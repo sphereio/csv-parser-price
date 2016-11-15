@@ -19,7 +19,7 @@
   },
   "main": "",
   "bin": {
-    "csvparserprice": "lib/csvparserprice.js"
+    "csvparserprice": "bin/csvparserprice.js"
   },
   "repository": {
     "type": "git",

@@ -1,40 +1,32 @@
 import test from 'tape'
-import { spawn } from 'child_process'
+import { exec } from 'child_process'
 import cli from '../../bin/csvparserprice'
+
+// Since the CLI keeps listening to stdin we need to close it manually
+test.onFinish(() => process.exit(0))
 
 test('CLI should exist', (t) => {
   t.ok(cli)
   t.end()
 })
 
-// fail when given no inputFile
-// output JSON on input
-// write a file?
-
-test('CLI help output', (t) => {
-  const csvparserprice = spawn('csvparserprice', ['help'])
-
-  csvparserprice.on(
-    'data',
-    data => t.true(String(data).match(/help/), 'logs help text')
-  )
-  csvparserprice.on(
-    'close',
-    signal => t.false(signal, 'exits with success signal')
-  )
+test('CLI should name process', (t) => {
+  t.equal(process.title, 'csvparserprice')
   t.end()
 })
 
-test.only('CLI exits with errors given no input', (t) => {
-  const csvparserprice = spawn('csvparserprice')
+test('CLI help output', (t) => {
+  exec('csvparserprice --help', (error, stdout) => {
+    t.true(String(stdout).match(/help/), 'outputs help text')
+    t.false(error, 'no error')
+    t.end()
+  })
+})
 
-  csvparserprice.on(
-    'data',
-    data => t.true(String(data).match(/help/), 'logs help text')
-  )
-  csvparserprice.on(
-    'close',
-    signal => t.true(signal, 'exits with error signal')
-  )
-  t.end()
+test('CLI takes input from file', (t) => {
+  exec('csvparserprice -i ./test/integration/sample.csv', (error, stdout) => {
+    t.true(stdout.match(/prices/), 'outputs \'prices\'')
+    t.false(error, 'no error')
+    t.end()
+  })
 })
