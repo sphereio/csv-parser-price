@@ -91,6 +91,7 @@
     "instrument": false
   },
   "dependencies": {
+    "JSONStream": "^1.2.1",
     "args": "^2.1.0",
     "bluebird": "^3.4.6",
     "csv-parser": "^1.11.0",

@@ -1,4 +1,3 @@
-import fs from 'fs'
 import JSONStream from 'JSONStream'
 import _ from 'underscore'
 import csv from 'csv-parser'
