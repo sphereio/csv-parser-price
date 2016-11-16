@@ -71,4 +71,11 @@ const priceCsvParser = new PriceCsvParser(
   }
 )
 
-priceCsvParser.parse(args.inputFile, args.outputFile, process.stderr)
+// Handle an error by logging and exiting the process
+args.outputFile
+  .on('error', (error) => {
+    process.stderr.write(error.message)
+    process.exit(1)
+  })
+
+priceCsvParser.parse(args.inputFile, args.outputFile)

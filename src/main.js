@@ -19,17 +19,18 @@ export default class PriceCsvParser {
     this.config = config
   }
 
-  parse (input, output, errors) {
+  parse (input, output) {
     let rowIndex = 1
-    errors.write('hey')
 
     highland(input)
       .through(csv({
         separator: this.config.delimiter || CONS.standards.delimiter,
+        strict: true,
       }))
-      .doto(() => (rowIndex += 1))
+      .stopOnError(error => output.emit('error', error))
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
+      .stopOnError(error => output.emit('error', error))
       .pipe(JSONStream.stringify('{ "prices": [\n', '\n,\n', '\n]}\n'))
       .pipe(output)
   }
