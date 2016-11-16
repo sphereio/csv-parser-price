@@ -60,7 +60,7 @@ const priceCsvParser = new PriceCsvParser(
   },
   {
     sphereClientConfig: {
-      config: getApiCredentials(),
+      config: getApiCredentials('CSV_PARSER_PRICE'),
       host: args.host,
       protocol: args.protocol,
       access_token: args.accessToken,
