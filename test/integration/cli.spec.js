@@ -24,7 +24,9 @@ test('CLI help output', (t) => {
 })
 
 test('CLI takes input from file', (t) => {
-  exec('csvparserprice -i ./test/integration/sample.csv', (error, stdout) => {
+  const csvFilePath = './test/helpers/simple-sample.csv'
+
+  exec(`csvparserprice -i ${csvFilePath}`, (error, stdout) => {
     t.true(stdout.match(/prices/), 'outputs \'prices\'')
     t.false(error, 'no error')
     t.end()
