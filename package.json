@@ -27,13 +27,13 @@
   },
   "scripts": {
     "start": "npm run test:watch",
-    "test": "cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
+    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
     "test:watch": "chokidar src test bin -c 'npm test'",
     "build": "babel src bin -d lib",
     "clean": "rimraf lib/*",
     "commit": "git-cz",
     "codecov": "cat ./coverage/lcov.info | codecov",
-    "coverage": "npm run lint && npm run build && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
+    "coverage": "npm run lint && npm run clean && npm run build && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
     "coverage:html": "npm run lint && cross-env NODE_ENV=test nyc --reporter=html npm test",
     "lint": "./scripts/lint src test"
   },
