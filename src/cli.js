@@ -2,9 +2,9 @@
 
 import fs from 'fs'
 import cli from 'args'
+import { ProjectCredentialsConfig } from 'sphere-node-utils'
 
 import CONS from './constants'
-import getApiCredentials from './get-api-credentials'
 import PriceCsvParser from './main'
 
 process.title = 'csvparserprice'
@@ -33,9 +33,13 @@ const args = cli
     }
   )
   .option(
-    'delimiter',
+    ['d', 'delimiter'],
     'The delimiter that is used in the csv.',
     CONS.standards.delimiter
+  )
+  .option(
+    ['p', 'projectKey'],
+    'The project key from the API.'
   )
   .option(
     'host',
@@ -51,31 +55,46 @@ const args = cli
   )
   .parse(process.argv)
 
-const priceCsvParser = new PriceCsvParser(
-  {
-    trace: process.stdout,
-    debug: process.stdout,
-    info: process.stdout,
-    error: process.stderr,
-  },
-  {
-    sphereClientConfig: {
-      config: getApiCredentials('CSV_PARSER_PRICE'),
-      host: args.host,
-      protocol: args.protocol,
-      access_token: args.accessToken,
-    },
-  },
-  {
-    delimiter: args.delimiter,
-  }
-)
-
 // Handle an error by logging and exiting the process
 args.outputFile
-  .on('error', (error) => {
-    process.stderr.write(error.message)
-    process.exit(1)
-  })
+.on('error', (error) => {
+  process.stderr.write(error.message)
+  process.exit(1)
+})
 
-priceCsvParser.parse(args.inputFile, args.outputFile)
+const getCredentials = () => {
+  return args.accessToken
+    ? Promise.resolve({ project_key: args.projectKey })
+    : ProjectCredentialsConfig.create()
+      .then((credentials) => {
+        return credentials.enrichCredentials({
+          project_key: args.projectKey,
+        })
+      })
+}
+
+getCredentials()
+  .then((sphereCredentials) => {
+    return new PriceCsvParser(
+      {
+        trace: process.stdout,
+        debug: process.stdout,
+        info: process.stdout,
+        error: process.stderr,
+      },
+      {
+        sphereClientConfig: {
+          config: sphereCredentials,
+          host: args.host,
+          protocol: args.protocol,
+          access_token: args.accessToken,
+        },
+      },
+      {
+        delimiter: args.delimiter,
+      }
+    )
+  })
+  .then((priceCsvParser) => {
+    priceCsvParser.parse(args.inputFile, args.outputFile)
+  })
