@@ -2,9 +2,9 @@
 
 import fs from 'fs'
 import cli from 'args'
-import { ProjectCredentialsConfig } from 'sphere-node-utils'
 
 import CONS from './constants'
+import getApiCredentials from './get-api-credentials'
 import PriceCsvParser from './main'
 
 process.title = 'csvparserprice'
@@ -45,10 +45,10 @@ const args = cli
     'host',
     'HTTP client host parameter to connect to the API.'
   )
-  .option(
-    'protocol',
-    'HTTP client protocol parameter to connect to the API.'
-  )
+  // .option(
+  //   'protocol',
+  //   'HTTP client protocol parameter to connect to the API.'
+  // )
   .option(
     'accessToken',
     'HTTP client access token to authenticate to the API.'
@@ -57,23 +57,12 @@ const args = cli
 
 // Handle an error by logging and exiting the process
 args.outputFile
-.on('error', (error) => {
-  process.stderr.write(error.message)
-  process.exit(1)
-})
+  .on('error', (error) => {
+    process.stderr.write(error.message)
+    process.exit(1)
+  })
 
-const getCredentials = () => {
-  return args.accessToken
-    ? Promise.resolve({ project_key: args.projectKey })
-    : ProjectCredentialsConfig.create()
-      .then((credentials) => {
-        return credentials.enrichCredentials({
-          project_key: args.projectKey,
-        })
-      })
-}
-
-getCredentials()
+getApiCredentials(args.projectKey, args.accessToken)
   .then((sphereCredentials) => {
     return new PriceCsvParser(
       {
