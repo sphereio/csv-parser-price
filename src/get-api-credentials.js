@@ -9,11 +9,11 @@ const getApiCredentials = (projectKey, accessToken) => {
     Promise.resolve({ project_key: projectKey })
 
   return ProjectCredentialsConfig.create()
-    .then((credentials) => {
-      return credentials.enrichCredentials({
+    .then(credentials =>
+      credentials.enrichCredentials({
         project_key: projectKey,
       })
-    })
+    )
 }
 
 export default getApiCredentials

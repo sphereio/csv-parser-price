@@ -104,6 +104,7 @@
     "sphere-node-sdk": "^1.16.0",
     "sphere-node-utils": "^0.8.6",
     "underscore": "^1.8.3",
-    "underscore-mixins": "^0.1.4"
+    "underscore-mixins": "^0.1.4",
+    "yargs": "^6.4.0"
   }
 }

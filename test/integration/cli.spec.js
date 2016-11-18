@@ -3,7 +3,7 @@ import { exec } from 'child_process'
 
 let PROJECT_KEY
 if (process.env.CI === 'true')
-  PROJECT_KEY = process.env.CM_PROJECT_KEY
+  PROJECT_KEY = process.env.SPHERE_PROJECT_KEY
 else
   PROJECT_KEY = process.env.npm_config_projectkey
 
@@ -21,7 +21,7 @@ test('CLI help flag', (t) => {
 test('CLI takes input from file', (t) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
 
-  exec(`csvparserprice -p ${PROJECT_KEY} -i ${csvFilePath}`,
+  exec(`csvparserprice -p ${PROJECT_KEY} --inputFile ${csvFilePath}`,
     (error, stdout, stderr) => {
       t.true(stdout.match(/prices/), 'outputs \'prices\'')
       t.false(error && stderr, 'returns no error')

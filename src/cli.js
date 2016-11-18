@@ -2,58 +2,81 @@
 
 import fs from 'fs'
 import cli from 'args'
+import yargs from 'yargs'
 
-import CONS from './constants'
+import CONSTANTS from './constants'
 import getApiCredentials from './get-api-credentials'
 import PriceCsvParser from './main'
 
 process.title = 'csvparserprice'
+cli.parse(process.argv)
 
-const args = cli
-  .option(
-    ['i', 'inputFile'],
-    'File to get CSV from.',
-    process.stdin,
-    (arg) => {
-      if (typeof arg === 'string')
-        return fs.createReadStream(String(arg))
+const args = yargs
+  .usage(
+    `\n
+Usage: $0 [options]
+Convert commercetools price CSV data to JSON.`
+  )
+  .showHelpOnFail(false)
 
-      return arg
-    }
-  )
-  .option(
-    ['o', 'outputFile'],
-    'File to output JSON to.',
-    process.stdout,
-    (arg) => {
-      if (typeof arg === 'string')
-        return fs.createWriteStream(String(arg))
+  .option('help', {
+    alias: 'h',
+  })
+  .help('help', 'Show help text.')
 
-      return arg
-    }
-  )
-  .option(
-    ['d', 'delimiter'],
-    'The delimiter that is used in the csv.',
-    CONS.standards.delimiter
-  )
-  .option(
-    ['p', 'projectKey'],
-    'The project key from the API.'
-  )
-  .option(
-    'host',
-    'HTTP client host parameter to connect to the API.'
-  )
-  // .option(
-  //   'protocol',
-  //   'HTTP client protocol parameter to connect to the API.'
-  // )
-  .option(
-    'accessToken',
-    'HTTP client access token to authenticate to the API.'
-  )
-  .parse(process.argv)
+  .option('inputFile', {
+    alias: 'i',
+    default: 'stdin',
+    describe: 'Path to CSV file.',
+  })
+  .coerce('inputFile', (arg) => {
+    if (arg !== 'stdin')
+      return fs.createReadStream(String(arg))
+
+    return process.stdin
+  })
+
+  .option('outputFile', {
+    alias: 'o',
+    default: 'stdout',
+    describe: 'Input CSV file.',
+  })
+  .coerce('outputFile', (arg) => {
+    if (arg !== 'stdout')
+      return fs.createWriteStream(String(arg))
+
+    return process.stdout
+  })
+
+  .option('delimiter', {
+    alias: 'd',
+    default: CONSTANTS.standards.delimiter,
+    describe: 'Used CSV delimiter.',
+  })
+
+  .option('strictMode', {
+    alias: 's',
+    default: CONSTANTS.standards.strictMode,
+    describe: 'Parse CSV strictly.',
+  })
+
+  .option('projectKey', {
+    alias: 'p',
+    describe: 'API project key.',
+  })
+
+  .option('host', {
+    describe: 'HTTP client host parameter.',
+  })
+
+  .option('protocol', {
+    describe: 'HTTP client protocol parameter.',
+  })
+
+  .option('accessToken', {
+    describe: 'HTTP client access token.',
+  })
+  .argv
 
 // Handle an error by logging and exiting the process
 args.outputFile
@@ -63,8 +86,8 @@ args.outputFile
   })
 
 getApiCredentials(args.projectKey, args.accessToken)
-  .then((sphereCredentials) => {
-    return new PriceCsvParser(
+  .then(sphereCredentials =>
+    new PriceCsvParser(
       {
         trace: process.stdout,
         debug: process.stdout,
@@ -83,7 +106,7 @@ getApiCredentials(args.projectKey, args.accessToken)
         delimiter: args.delimiter,
       }
     )
-  })
+  )
   .then((priceCsvParser) => {
     priceCsvParser.parse(args.inputFile, args.outputFile)
   })

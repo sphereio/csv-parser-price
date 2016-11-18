@@ -17,6 +17,8 @@ export default class PriceCsvParser {
     this.mapCustomFields = MapCustomFields()
     this.error = []
     this.config = config
+    this.delimiter = this.config.delimiter || CONS.standards.delimiter
+    this.strictMode = this.config.strictMode || CONS.standards.strictMode
   }
 
   parse (input, output) {
@@ -24,10 +26,11 @@ export default class PriceCsvParser {
 
     highland(input)
       .through(csv({
-        separator: this.config.delimiter || CONS.standards.delimiter,
-        strict: true,
+        separator: this.delimiter,
+        strict: this.strictMode,
       }))
       .stopOnError(error => output.emit('error', error))
+      .doto(() => (rowIndex += 1))
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .stopOnError(error => output.emit('error', error))

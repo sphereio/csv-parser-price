@@ -1,11 +1,13 @@
-import test from 'tape'
-import sinon from 'sinon'
-import StreamTest from 'streamtest'
 import fs from 'fs'
 import path from 'path'
+import sinon from 'sinon'
 import { SphereClient } from 'sphere-node-sdk'
+import StreamTest from 'streamtest'
+import test from 'tape'
 import PriceCsvParser from 'main'
+
 import { mockPriceObj, mockCustomTypeDef } from './helpers/mockData'
+import CONSTANTS from '../src/constants'
 
 const logger = {
   trace: process.stdout,
@@ -54,14 +56,25 @@ test('PriceCsvParser module is a class', (t) => {
 test(`PriceCsvParser
   should initialize default values`, (t) => {
   const priceCsvParser = new PriceCsvParser(logger, options)
-  const expected = SphereClient
-  const actual = priceCsvParser.client.constructor
 
   t.equal(
-    actual,
-    expected,
+    priceCsvParser.client.constructor,
+    SphereClient,
     'productType import module is an instanceof SphereClient'
   )
+
+  t.equal(
+    priceCsvParser.delimiter,
+    CONSTANTS.standards.delimiter,
+    'delimiter should be set to the standard value'
+  )
+
+  t.equal(
+    priceCsvParser.strictMode,
+    CONSTANTS.standards.strictMode,
+    'strictMode should be set to the standard value'
+  )
+
   t.end()
 })
 
