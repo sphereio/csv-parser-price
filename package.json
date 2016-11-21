@@ -7,8 +7,7 @@
     "nodejs",
     "csv",
     "json",
-    "parser",
-    "sphereio"
+    "parser"
   ],
   "homepage": "https://github.com/commercetools/csv-parser-price#readme",
   "bugs": "https://github.com/commercetools/csv-parser-price/issues",
@@ -18,20 +17,22 @@
     "email": "abimbola.idowu@commercetools.de"
   },
   "main": "",
+  "bin": {
+    "csvparserprice": "bin/csvparserprice.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/commercetools/csv-parser-price.git"
   },
   "scripts": {
     "start": "npm run test:watch",
-    "test": "cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
+    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
     "test:watch": "chokidar src test bin -c 'npm test'",
-    "build": "babel src bin -d lib",
-    "takeoff": "cross-env NODE_ENV=test NODE_PATH=./src chokidar src bin -c 'npm run build && sudo chmod +x ./lib/csvparserprice.js && cat output.csv | ./lib/csvparserprice.js'",
+    "build": "npm run clean && babel src bin -d lib",
     "clean": "rimraf lib/*",
     "commit": "git-cz",
     "codecov": "cat ./coverage/lcov.info | codecov",
-    "coverage": "npm run lint && npm run clean && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
+    "coverage": "npm run lint npm run build && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
     "coverage:html": "npm run lint && cross-env NODE_ENV=test nyc --reporter=html npm test",
     "lint": "./scripts/lint src test"
   },
@@ -79,6 +80,7 @@
     "streamtest": "^1.2.2",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0",
+    "tmp": "^0.0.31",
     "validate-commit-msg": "^2.8.0"
   },
   "engines": {
@@ -93,7 +95,6 @@
   },
   "dependencies": {
     "JSONStream": "^1.2.1",
-    "args": "^2.1.0",
     "bluebird": "^3.4.6",
     "csv-parser": "^1.11.0",
     "flat": "^2.0.1",
@@ -102,6 +103,7 @@
     "sphere-node-sdk": "^1.16.0",
     "sphere-node-utils": "^0.8.6",
     "underscore": "^1.8.3",
-    "underscore-mixins": "^0.1.4"
+    "underscore-mixins": "^0.1.4",
+    "yargs": "^6.4.0"
   }
 }

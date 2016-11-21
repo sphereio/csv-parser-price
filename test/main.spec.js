@@ -1,11 +1,13 @@
-import test from 'tape'
-import sinon from 'sinon'
-import StreamTest from 'streamtest'
 import fs from 'fs'
 import path from 'path'
+import sinon from 'sinon'
 import { SphereClient } from 'sphere-node-sdk'
+import StreamTest from 'streamtest'
+import test from 'tape'
 import PriceCsvParser from 'main'
-import { mockPriceObj, mockCustomTypeDef } from './helpers/mockData'
+
+import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
+import CONSTANTS from '../src/constants'
 
 const logger = {
   trace: process.stdout,
@@ -21,27 +23,25 @@ if (process.env.CI === 'true')
 else
   PROJECT_KEY = process.env.npm_config_projectkey
 
-const options = {
-  sphereClientConfig: {
-    config: {
-      project_key: PROJECT_KEY,
-      client_id: '*********',
-      client_secret: '*********',
+const apiClientConfig = {
+  config: {
+    project_key: PROJECT_KEY,
+    client_id: '*********',
+    client_secret: '*********',
+  },
+  rest: {
+    config: {},
+    GET: (endpoint, callback) => {
+      callback(null, { statusCode: 200 }, { results: [] })
     },
-    rest: {
-      config: {},
-      GET: (endpoint, callback) => {
-        callback(null, { statusCode: 200 }, { results: [] })
-      },
-      POST: (endpoint, payload, callback) => {
-        callback(null, { statusCode: 200 })
-      },
-      PUT: () => {},
-      DELETE: () => (/* endpoint, callback */) => {},
-      PAGED: () => (/* endpoint, callback */) => {},
-      _preRequest: () => {},
-      _doRequest: () => {},
+    POST: (endpoint, payload, callback) => {
+      callback(null, { statusCode: 200 })
     },
+    PUT: () => {},
+    DELETE: () => (/* endpoint, callback */) => {},
+    PAGED: () => (/* endpoint, callback */) => {},
+    _preRequest: () => {},
+    _doRequest: () => {},
   },
 }
 
@@ -53,15 +53,32 @@ test('PriceCsvParser module is a class', (t) => {
 
 test(`PriceCsvParser
   should initialize default values`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
-  const expected = SphereClient
-  const actual = priceCsvParser.client.constructor
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
 
   t.equal(
-    actual,
-    expected,
+    priceCsvParser.client.constructor,
+    SphereClient,
     'productType import module is an instanceof SphereClient'
   )
+
+  t.equal(
+    priceCsvParser.batchProcessing,
+    CONSTANTS.standards.batchSize,
+    'batchSize should be set to the standard value'
+  )
+
+  t.equal(
+    priceCsvParser.delimiter,
+    CONSTANTS.standards.delimiter,
+    'delimiter should be set to the standard value'
+  )
+
+  t.equal(
+    priceCsvParser.strictMode,
+    CONSTANTS.standards.strictMode,
+    'strictMode should be set to the standard value'
+  )
+
   t.end()
 })
 
@@ -74,7 +91,7 @@ test(`PriceCsvParser
 
 test(`PriceCsvParser::parse
   should accept a stream and output a stream`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
@@ -89,7 +106,7 @@ test(`PriceCsvParser::parse
 
 test(`PriceCsvParser::processData
   should process object and build valid price object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
@@ -122,7 +139,7 @@ test(`PriceCsvParser::processData
 
 test(`PriceCsvParser::processData
   should process object and build valid price object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
@@ -147,7 +164,7 @@ test(`PriceCsvParser::processData
 
 test(`PriceCsvParser::processCustomFields
   should build custom object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
@@ -176,7 +193,7 @@ test(`PriceCsvParser::processCustomFields
 
 test(`PriceCsvParser::processCustomFields
   should build report errors on data`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   _mockPriceObj.customField.priceset = '1,\'2\',3,4'

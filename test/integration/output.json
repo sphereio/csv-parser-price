@@ -1,0 +1,5 @@
+{ "prices": [
+{"sku":"123","prices":[{"variant-sku":"123","value":{"currencyCode":"EUR","centAmount":"4200"}}]}
+,
+{"sku":"123","prices":[{"variant-sku":"123","value":{"currencyCode":"EUR","centAmount":"4200"}}]}
+]}
