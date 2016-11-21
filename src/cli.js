@@ -99,12 +99,10 @@ getApiCredentials(args.projectKey, args.accessToken)
         error: process.stderr,
       },
       {
-        apiClientConfig: {
-          config: apiCredentials,
-          host: args.host,
-          protocol: args.protocol,
-          access_token: args.accessToken,
-        },
+        config: apiCredentials,
+        host: args.host,
+        protocol: args.protocol,
+        access_token: args.accessToken,
       },
       {
         delimiter: args.delimiter,

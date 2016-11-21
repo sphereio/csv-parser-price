@@ -23,27 +23,25 @@ if (process.env.CI === 'true')
 else
   PROJECT_KEY = process.env.npm_config_projectkey
 
-const options = {
-  apiClientConfig: {
-    config: {
-      project_key: PROJECT_KEY,
-      client_id: '*********',
-      client_secret: '*********',
+const apiClientConfig = {
+  config: {
+    project_key: PROJECT_KEY,
+    client_id: '*********',
+    client_secret: '*********',
+  },
+  rest: {
+    config: {},
+    GET: (endpoint, callback) => {
+      callback(null, { statusCode: 200 }, { results: [] })
     },
-    rest: {
-      config: {},
-      GET: (endpoint, callback) => {
-        callback(null, { statusCode: 200 }, { results: [] })
-      },
-      POST: (endpoint, payload, callback) => {
-        callback(null, { statusCode: 200 })
-      },
-      PUT: () => {},
-      DELETE: () => (/* endpoint, callback */) => {},
-      PAGED: () => (/* endpoint, callback */) => {},
-      _preRequest: () => {},
-      _doRequest: () => {},
+    POST: (endpoint, payload, callback) => {
+      callback(null, { statusCode: 200 })
     },
+    PUT: () => {},
+    DELETE: () => (/* endpoint, callback */) => {},
+    PAGED: () => (/* endpoint, callback */) => {},
+    _preRequest: () => {},
+    _doRequest: () => {},
   },
 }
 
@@ -55,7 +53,7 @@ test('PriceCsvParser module is a class', (t) => {
 
 test(`PriceCsvParser
   should initialize default values`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
 
   t.equal(
     priceCsvParser.client.constructor,
@@ -93,7 +91,7 @@ test(`PriceCsvParser
 
 test(`PriceCsvParser::parse
   should accept a stream and output a stream`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
@@ -108,7 +106,7 @@ test(`PriceCsvParser::parse
 
 test(`PriceCsvParser::processData
   should process object and build valid price object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
@@ -141,7 +139,7 @@ test(`PriceCsvParser::processData
 
 test(`PriceCsvParser::processData
   should process object and build valid price object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
@@ -166,7 +164,7 @@ test(`PriceCsvParser::processData
 
 test(`PriceCsvParser::processCustomFields
   should build custom object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
@@ -195,7 +193,7 @@ test(`PriceCsvParser::processCustomFields
 
 test(`PriceCsvParser::processCustomFields
   should build report errors on data`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, options)
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   _mockPriceObj.customField.priceset = '1,\'2\',3,4'

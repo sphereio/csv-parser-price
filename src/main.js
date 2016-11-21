@@ -9,7 +9,7 @@ import CONS from './constants'
 import MapCustomFields from './map-custom-fields'
 
 export default class PriceCsvParser {
-  constructor (logger, { apiClientConfig = {} }, config = {}) {
+  constructor (logger, apiClientConfig = {}, config = {}) {
     this.client = new SphereClient(apiClientConfig)
     this.encoding = 'utf-8'
     this.error = []
