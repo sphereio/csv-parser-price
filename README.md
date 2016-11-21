@@ -1,28 +1,40 @@
-<!-- This is the readme template for commercetools nodejs projects. We recommend you following this format when writing a readme project -->
 [![commercetools logo][commercetools-icon]][commercetools]
 
-# Unslugified Project Title
+# CSV Parser Price
 [![Travis Build Status][travis-icon]][travis]
 [![Codecov Coverage Status][codecov-icon]][codecov]
 [![David Dependencies Status][david-icon]][david]
 [![David devDependencies Status][david-dev-icon]][david-dev]
 
-A short description of what this project is about and it's core features. This might be followed by some points to clarify:
-- Do something with this
-- Supports other stuff
+Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON.
 
 ## Usage
-How to use this project, possibly with a small code example. Could be split into CLI and direct usage.
+
 ### CLI
-...
+```
+Usage: csvparserprice [options]
+Convert commercetools price CSV data to JSON.
+
+Options:
+  --help, -h        Show help text.                                  [boolean]
+  --inputFile, -i   Path to CSV file.                       [default: "stdin"]
+  --outputFile, -o  Input CSV file.                        [default: "stdout"]
+  --delimiter, -d   Used CSV delimiter.                         [default: ","]
+  --strictMode, -s  Parse CSV strictly.                        [default: true]
+  --projectKey, -p  API project key.
+  --host            HTTP client host parameter.
+  --protocol        HTTP client protocol parameter.
+  --accessToken     HTTP client access token.
+```
 ### JS
-...
+```js
+```
 
 ## Configuration
-Options to choose from if there are any should be listed inside this file.
+
 
 ## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md) for info on contributing to eslint-config
+See [CONTRIBUTING.md](CONTRIBUTING.md) for info on contributing.
 
 [commercetools]: https://commercetools.com/
 [commercetools-icon]: https://cdn.rawgit.com/commercetools/press-kit/master/PNG/72DPI/CT%20logo%20horizontal%20RGB%2072dpi.png
