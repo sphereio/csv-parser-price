@@ -64,6 +64,12 @@ test(`PriceCsvParser
   )
 
   t.equal(
+    priceCsvParser.batchProcessing,
+    CONSTANTS.standards.batchSize,
+    'batchSize should be set to the standard value'
+  )
+
+  t.equal(
     priceCsvParser.delimiter,
     CONSTANTS.standards.delimiter,
     'delimiter should be set to the standard value'

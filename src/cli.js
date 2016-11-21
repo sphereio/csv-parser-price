@@ -46,6 +46,12 @@ Convert commercetools price CSV data to JSON.`
     return process.stdout
   })
 
+  .option('batchSize', {
+    alias: 'b',
+    default: CONSTANTS.standards.batchSize,
+    describe: 'Amount of CSV rows to handle simultaneously.',
+  })
+
   .option('delimiter', {
     alias: 'd',
     default: CONSTANTS.standards.delimiter,

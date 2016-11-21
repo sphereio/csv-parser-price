@@ -11,12 +11,13 @@ import MapCustomFields from './map-custom-fields'
 export default class PriceCsvParser {
   constructor (logger, { apiClientConfig = {} }, config = {}) {
     this.client = new SphereClient(apiClientConfig)
-    this.logger = logger
     this.encoding = 'utf-8'
-    this.batchProcessing = '100'
-    this.mapCustomFields = MapCustomFields()
     this.error = []
+    this.logger = logger
+    this.mapCustomFields = MapCustomFields()
+
     this.config = config
+    this.batchProcessing = this.config.batchSize || CONS.standards.batchSize
     this.delimiter = this.config.delimiter || CONS.standards.delimiter
     this.strictMode = this.config.strictMode || CONS.standards.strictMode
   }
