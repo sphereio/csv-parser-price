@@ -13,7 +13,7 @@ export default class PriceCsvParser {
     this.client = new SphereClient(sphereClientConfig)
     this.logger = logger
     this.encoding = 'utf-8'
-    this.batchProcessing = '10'
+    this.batchProcessing = '100'
     this.mapCustomFields = MapCustomFields()
     this.error = []
     this.config = config
@@ -40,7 +40,7 @@ export default class PriceCsvParser {
 
   processData (data, rowIndex) {
     const _data = _.clone(data)
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const price = {
         sku: _data[CONS.HEADER_SKU],
         prices: [_data],
@@ -50,11 +50,14 @@ export default class PriceCsvParser {
         return this.processCustomFields(
           data,
           rowIndex
-        ).then((customTypeObj) => {
+        )
+        .then((customTypeObj) => {
           _data.custom = customTypeObj
           price.prices = [_data]
           resolve(price)
         })
+        .catch(reject)
+
       return resolve(price)
     })
   }

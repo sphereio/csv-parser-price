@@ -7,8 +7,7 @@
     "nodejs",
     "csv",
     "json",
-    "parser",
-    "sphereio"
+    "parser"
   ],
   "homepage": "https://github.com/commercetools/csv-parser-price#readme",
   "bugs": "https://github.com/commercetools/csv-parser-price/issues",
@@ -95,7 +94,6 @@
   },
   "dependencies": {
     "JSONStream": "^1.2.1",
-    "args": "^2.1.0",
     "bluebird": "^3.4.6",
     "csv-parser": "^1.11.0",
     "flat": "^2.0.1",

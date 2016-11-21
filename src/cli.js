@@ -1,7 +1,6 @@
 'use strict'
 
 import fs from 'fs'
-import cli from 'args'
 import yargs from 'yargs'
 
 import CONSTANTS from './constants'
@@ -9,7 +8,6 @@ import getApiCredentials from './get-api-credentials'
 import PriceCsvParser from './main'
 
 process.title = 'csvparserprice'
-cli.parse(process.argv)
 
 const args = yargs
   .usage(
