@@ -1,3 +1,4 @@
+import fs from 'fs'
 import test from 'tape'
 import { exec } from 'child_process'
 
@@ -23,9 +24,25 @@ test('CLI takes input from file', (t) => {
 
   exec(`csvparserprice -p ${PROJECT_KEY} --inputFile ${csvFilePath}`,
     (error, stdout, stderr) => {
-      t.true(stdout.match(/prices/), 'outputs \'prices\'')
+      t.true(stdout.match(/prices/), 'outputs data including \'prices\'')
       t.false(error && stderr, 'returns no error')
       t.end()
+    })
+})
+
+test('CLI writes output to file', (t) => {
+  const csvFilePath = './test/helpers/simple-sample.csv'
+  const jsonFilePath = '/tmp/output.json'
+
+  exec(`csvparserprice -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
+    (cliError, stdout, stderr) => {
+      t.false(cliError && stderr, 'returns no CLI error')
+
+      fs.readFile(jsonFilePath, { encoding: 'utf8' }, (error, data) => {
+        t.true(data.match(/prices/), 'writes data including \'prices\'')
+        t.false(error, 'returns no FS error')
+        t.end()
+      })
     })
 })
 

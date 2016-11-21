@@ -6,7 +6,7 @@ import StreamTest from 'streamtest'
 import test from 'tape'
 import PriceCsvParser from 'main'
 
-import { mockPriceObj, mockCustomTypeDef } from './helpers/mockData'
+import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
 import CONSTANTS from '../src/constants'
 
 const logger = {

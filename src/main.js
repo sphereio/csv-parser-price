@@ -6,7 +6,7 @@ import highland from 'highland'
 import { SphereClient } from 'sphere-node-sdk'
 
 import CONS from './constants'
-import MapCustomFields from './mapCustomFields'
+import MapCustomFields from './map-custom-fields'
 
 export default class PriceCsvParser {
   constructor (logger, { sphereClientConfig = {} }, config = {}) {
