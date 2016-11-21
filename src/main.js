@@ -35,7 +35,18 @@ export default class PriceCsvParser {
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .stopOnError(error => output.emit('error', error))
-      .pipe(JSONStream.stringify('{ "prices": [\n', '\n,\n', '\n]}\n'))
+      .reduce({ prices: [] }, (a, b) => {
+        if (a.prices.length) {
+          const _price = _.find(a.prices, price => price.sku === b.sku)
+          if (!_price)
+            a.prices.push(b)
+          else
+            _price.prices.push(...b.prices)
+        } else
+          a.prices.push(b)
+        return a
+      })
+      .pipe(JSONStream.stringify(false))
       .pipe(output)
   }
 

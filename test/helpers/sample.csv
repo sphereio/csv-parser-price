@@ -1,3 +1,4 @@
 variant-id,variant-sku,variant-key,value.currencyCode,value.centAmount,country,customerGroup.groupName,channel.key,validFrom,validUntil,customType,customField.foo,customField.bar,customField.current,customField.name.nl,customField.name.de,customField.status,customField.price,customField.priceset
 123,my-price,my-price-key,EUR,4200,DE,customer-group,my-channel,2016-11-01T08:01:19+0000,2016-12-01T08:03:10+0000,custom-type,12,nac,true,Selwyn,Merkel,Ready,EUR 1200,"1,2,3,5"
 123,my-price,my-price-key,EUR,4200,DE,customer-group,my-channel,2016-11-01T08:01:19+0000,2016-12-01T08:03:10+0000,custom-type,12,nac,true,Selwyn,Merkel,Ready,EUR 1200,"1,2,3,5"
+123,my-price2,my-price-key,EUR,4200,DE,customer-group,my-channel,2016-11-01T08:01:19+0000,2016-12-01T08:03:10+0000,custom-type,12,nac,true,Selwyn,Merkel,Ready,EUR 1200,"1,2,3,5"

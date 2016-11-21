@@ -104,6 +104,23 @@ test(`PriceCsvParser::parse
   priceCsvParser.parse(readStream, outputStream)
 })
 
+test(`PriceCsvParser::parse
+  should group prices by variants sku`, (t) => {
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const readStream = fs.createReadStream(
+    path.join(__dirname, 'helpers/sample.csv')
+  )
+  const outputStream = StreamTest['v2'].toText((err, result) => {
+    const prices = JSON.parse(result).prices
+    t.equal(prices.length, 2, 'All prices from the csv is parsed')
+    t.equal(prices[0].prices.length, 2, 'price with similar skus are grouped')
+    t.equal(prices[1].prices.length, 1, 'price with similar skus are grouped')
+    t.ok(prices[0].sku, 'Sku exists on price object')
+    t.end()
+  })
+  priceCsvParser.parse(readStream, outputStream)
+})
+
 test(`PriceCsvParser::processData
   should process object and build valid price object`, (t) => {
   const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
