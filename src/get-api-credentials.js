@@ -3,10 +3,10 @@ import Promise from 'bluebird'
 
 const getApiCredentials = (projectKey, accessToken) => {
   if (!projectKey)
-    Promise.reject(new Error('Project Key is needed'))
+    return Promise.reject(new Error('Project Key is needed'))
 
   if (accessToken)
-    Promise.resolve({ project_key: projectKey })
+    return Promise.resolve({ project_key: projectKey })
 
   return ProjectCredentialsConfig.create()
     .then(credentials =>
