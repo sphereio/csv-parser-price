@@ -1,5 +1,6 @@
 import fs from 'fs'
 import test from 'tape'
+import tmp from 'tmp'
 import { exec } from 'child_process'
 
 const binPath = './bin/csvparserprice.js'
@@ -31,7 +32,7 @@ test('CLI takes input from file', (t) => {
 
 test('CLI writes output to file', (t) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
-  const jsonFilePath = '/tmp/output.json'
+  const jsonFilePath = tmp.fileSync().name
 
   exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
     (cliError, stdout, stderr) => {
