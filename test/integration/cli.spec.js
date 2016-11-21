@@ -10,9 +10,6 @@ if (process.env.CI === 'true')
 else
   PROJECT_KEY = process.env.npm_config_projectkey
 
-// Since the CLI keeps listening to stdin we need to close it manually
-test.onFinish(() => process.exit(0))
-
 test('CLI help flag', (t) => {
   exec(`${binPath} --help`, (error, stdout, stderr) => {
     t.true(String(stdout).match(/help/), 'outputs help text')
