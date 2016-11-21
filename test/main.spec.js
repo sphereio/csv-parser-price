@@ -24,7 +24,7 @@ else
   PROJECT_KEY = process.env.npm_config_projectkey
 
 const options = {
-  sphereClientConfig: {
+  apiClientConfig: {
     config: {
       project_key: PROJECT_KEY,
       client_id: '*********',

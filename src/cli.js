@@ -84,7 +84,7 @@ args.outputFile
   })
 
 getApiCredentials(args.projectKey, args.accessToken)
-  .then(sphereCredentials =>
+  .then(apiCredentials =>
     new PriceCsvParser(
       {
         trace: process.stdout,
@@ -93,8 +93,8 @@ getApiCredentials(args.projectKey, args.accessToken)
         error: process.stderr,
       },
       {
-        sphereClientConfig: {
-          config: sphereCredentials,
+        apiClientConfig: {
+          config: apiCredentials,
           host: args.host,
           protocol: args.protocol,
           access_token: args.accessToken,

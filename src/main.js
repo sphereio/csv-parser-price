@@ -9,8 +9,8 @@ import CONS from './constants'
 import MapCustomFields from './map-custom-fields'
 
 export default class PriceCsvParser {
-  constructor (logger, { sphereClientConfig = {} }, config = {}) {
-    this.client = new SphereClient(sphereClientConfig)
+  constructor (logger, { apiClientConfig = {} }, config = {}) {
+    this.client = new SphereClient(apiClientConfig)
     this.logger = logger
     this.encoding = 'utf-8'
     this.batchProcessing = '100'
