@@ -137,7 +137,7 @@ test(`PriceCsvParser::processData
     t.equal(price.country, 'DE', 'Price country parsed successfully')
     t.deepEqual(price.value, {
       currencyCode: 'EUR',
-      centAmount: '4200',
+      centAmount: 4200,
     }, 'Money object built successfully')
     t.deepEqual(price.custom, {
       type: { id: '795962e6-c0cc-4b4d-84fc-7d8aaed390c0' },
@@ -172,8 +172,32 @@ test(`PriceCsvParser::processData
     t.equal(price.country, 'DE', 'Price country parsed successfully')
     t.deepEqual(price.value, {
       currencyCode: 'EUR',
-      centAmount: '4200',
+      centAmount: 4200,
     }, 'Money object built successfully')
+    t.notOk(price.custom, 'Custom fields obj should not be present')
+    t.end()
+  })
+})
+
+test(`PriceCsvParser::processData
+  should process object and build valid price object
+  if centAmount is not present`, (t) => {
+  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const _mockPriceObj = mockPriceObj()
+  delete _mockPriceObj.customType
+  delete _mockPriceObj.customField
+  delete _mockPriceObj.value
+  const _mockCustomTypeDef = mockCustomTypeDef()
+  sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
+    Promise.resolve({ body: _mockCustomTypeDef })
+  )
+  priceCsvParser.processData(_mockPriceObj, 2).then((result) => {
+    t.ok(result)
+    t.ok(result.sku)
+    t.equal(result.prices.length, 1, 'One price object is built')
+    const price = result.prices[0]
+    t.equal(price.country, 'DE', 'Price country parsed successfully')
+    t.notOk(price.value)
     t.notOk(price.custom, 'Custom fields obj should not be present')
     t.end()
   })

@@ -56,6 +56,8 @@ export default class PriceCsvParser {
   processData (data, rowIndex) {
     const _data = _.clone(data)
     return new Promise((resolve, reject) => {
+      if (_data.value && _data.value.centAmount)
+        _data.value.centAmount = parseInt(_data.value.centAmount, 10)
       const price = {
         sku: _data[CONSTANTS.header.SKU],
         prices: [_data],
