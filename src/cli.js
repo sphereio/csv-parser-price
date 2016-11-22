@@ -48,19 +48,19 @@ Convert commercetools price CSV data to JSON.`
 
   .option('batchSize', {
     alias: 'b',
-    default: CONSTANTS.standards.batchSize,
-    describe: 'Amount of CSV rows to handle simultaneously.',
+    default: CONSTANTS.standardOption.batchSize,
+    describe: 'Number of CSV rows to handle simultaneously.',
   })
 
   .option('delimiter', {
     alias: 'd',
-    default: CONSTANTS.standards.delimiter,
+    default: CONSTANTS.standardOption.delimiter,
     describe: 'Used CSV delimiter.',
   })
 
   .option('strictMode', {
     alias: 's',
-    default: CONSTANTS.standards.strictMode,
+    default: CONSTANTS.standardOption.strictMode,
     describe: 'Parse CSV strictly.',
   })
 
@@ -93,10 +93,10 @@ getApiCredentials(args.projectKey, args.accessToken)
   .then(apiCredentials =>
     new PriceCsvParser(
       {
-        trace: process.stdout,
         debug: process.stdout,
-        info: process.stdout,
         error: process.stderr,
+        info: process.stdout,
+        trace: process.stdout,
       },
       {
         config: apiCredentials,

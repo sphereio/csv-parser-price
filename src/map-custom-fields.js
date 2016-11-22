@@ -1,5 +1,5 @@
 import _ from 'underscore'
-import CONS from './constants'
+import CONSTANTS from './constants'
 
 export default function MapCustomFields () {
   // Private methods
@@ -120,12 +120,12 @@ export default function MapCustomFields () {
       const result = {}
       if (!isValidValue(value))
         return result
-      const matchedMoney = CONS.REGEX_MONEY.exec(value)
+      const matchedMoney = CONSTANTS.field.MONEY.exec(value)
       if (!matchedMoney) {
         result.error = `Invalid money - Cannot parse money ${value}`
         return result
       }
-      const validCurr = CONS.REGEX_CUR.exec(matchedMoney[1])
+      const validCurr = CONSTANTS.field.CUR.exec(matchedMoney[1])
       if (!validCurr) {
         result.error = `Parsed currency '${matchedMoney[1]}' is not valid`
         return result
@@ -188,7 +188,7 @@ export default function MapCustomFields () {
       }, result)
     },
 
-    mapNumber: function mapNumber (rawNo, regEx = CONS.REGEX_INTEGER) {
+    mapNumber: function mapNumber (rawNo, regEx = CONSTANTS.field.INTEGER) {
       const result = {}
       if (!isValidValue(rawNo))
         return result

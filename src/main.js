@@ -5,7 +5,7 @@ import { unflatten } from 'flat'
 import highland from 'highland'
 import { SphereClient } from 'sphere-node-sdk'
 
-import CONS from './constants'
+import CONSTANTS from './constants'
 import MapCustomFields from './map-custom-fields'
 
 export default class PriceCsvParser {
@@ -17,9 +17,12 @@ export default class PriceCsvParser {
     this.mapCustomFields = MapCustomFields()
 
     this.config = config
-    this.batchProcessing = this.config.batchSize || CONS.standards.batchSize
-    this.delimiter = this.config.delimiter || CONS.standards.delimiter
-    this.strictMode = this.config.strictMode || CONS.standards.strictMode
+    this.batchProcessing =
+      this.config.batchSize || CONSTANTS.standardOption.batchSize
+    this.delimiter =
+      this.config.delimiter || CONSTANTS.standardOption.delimiter
+    this.strictMode =
+      this.config.strictMode || CONSTANTS.standardOption.strictMode
   }
 
   parse (input, output) {
@@ -54,7 +57,7 @@ export default class PriceCsvParser {
     const _data = _.clone(data)
     return new Promise((resolve, reject) => {
       const price = {
-        sku: _data[CONS.HEADER_SKU],
+        sku: _data[CONSTANTS.header.SKU],
         prices: [_data],
       }
 
