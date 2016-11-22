@@ -83,7 +83,7 @@ test(`MapCustomFields::parse
       de: 'Merkel',
     },
     enumtype: 'Ready',
-    money: 'ABI 1200',
+    money: 'ABI',
     settype: 'qw,\'2\',v,t',
   }
 
@@ -108,7 +108,7 @@ test(`MapCustomFields::parse
     // eslint-disable-next-line max-len
     '[row 1: my-category] - \'unsupported\' type is not supported! Kindly raise an issue for this',
     '[row 1: my-category] - The value \'abi§\' is not a valid boolean value',
-    '[row 1: my-category] - Parsed currency \'ABI\' is not valid',
+    '[row 1: my-category] - Invalid money - Cannot parse money ABI',
     '[row 1: my-category] - The number qw isn\'t valid',
     '[row 1: my-category] - The number \'2\' isn\'t valid',
     '[row 1: my-category] - The number v isn\'t valid',
@@ -193,21 +193,6 @@ test(`MapCustomFields::mapMoney
   const result = mapCustomFields.mapMoney('')
 
   t.notOk(result.error, 'There is no error')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
-})
-
-test(`MapCustomFields::mapMoney
-  should return error when invalid curr is passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
-  const result = mapCustomFields.mapMoney('ABI 200')
-
-  t.ok(result.error, 'There is error with input')
-  t.equal(
-    result.error,
-    'Parsed currency \'ABI\' is not valid',
-    'Parsed currency is not valid'
-  )
   t.notOk(result.data, 'No data is returned')
   t.end()
 })

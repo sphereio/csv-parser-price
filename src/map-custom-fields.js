@@ -120,14 +120,10 @@ export default function MapCustomFields () {
       const result = {}
       if (!isValidValue(value))
         return result
+
       const matchedMoney = CONSTANTS.field.MONEY.exec(value)
       if (!matchedMoney) {
         result.error = `Invalid money - Cannot parse money ${value}`
-        return result
-      }
-      const validCurr = CONSTANTS.field.CUR.exec(matchedMoney[1])
-      if (!validCurr) {
-        result.error = `Parsed currency '${matchedMoney[1]}' is not valid`
         return result
       }
 
