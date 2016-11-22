@@ -39,6 +39,7 @@ export default class CsvParserPrice {
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .stopOnError(error => output.emit('error', error))
       .reduce({ prices: [] }, (a, b) => {
+        // This thing really needs a proper comment, MAGIC!
         if (a.prices.length) {
           const _price = _.find(a.prices, price => price.sku === b.sku)
           if (!_price)
@@ -95,8 +96,8 @@ export default class CsvParserPrice {
       delete priceObj.customField
     if (priceObj['variant-id'])
       delete priceObj['variant-id']
-    if (priceObj['variant-sku'])
-      delete priceObj['variant-sku']
+    if (priceObj[CONSTANTS.header.sku])
+      delete priceObj[CONSTANTS.header.sku]
     if (priceObj['variant-key'])
       delete priceObj['variant-key']
     return data
