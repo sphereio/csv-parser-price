@@ -9,6 +9,7 @@
 Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON.
 
 ## Usage
+`npm install csv-parser-price`
 
 ### CLI
 ```
@@ -16,22 +17,58 @@ Usage: csvparserprice [options]
 Convert commercetools price CSV data to JSON.
 
 Options:
-  --help, -h        Show help text.                                  [boolean]
-  --inputFile, -i   Path to CSV file.                       [default: "stdin"]
-  --outputFile, -o  Input CSV file.                        [default: "stdout"]
-  --delimiter, -d   Used CSV delimiter.                         [default: ","]
-  --strictMode, -s  Parse CSV strictly.                        [default: true]
-  --projectKey, -p  API project key.
-  --host            HTTP client host parameter.
-  --protocol        HTTP client protocol parameter.
-  --accessToken     HTTP client access token.
+--help, -h        Show help text.                                    [boolean]
+--inputFile, -i   Path to CSV file.                         [default: "stdin"]
+--outputFile, -o  Input CSV file.                          [default: "stdout"]
+--batchSize, -b   Amount of CSV rows to handle simultaneously.  [default: 100]
+--delimiter, -d   Used CSV delimiter.                           [default: ","]
+--strictMode, -s  Parse CSV strictly.                          [default: true]
+--projectKey, -p  API project key.
+--host            HTTP client host parameter.
+--protocol        HTTP client protocol parameter.
+--accessToken     HTTP client access token.
 ```
 ### JS
 ```js
+const fs = require('fs');
+const PriceCsvParser = require('csv-parser-price');
+
+const apiCredentials = {
+    project_key: process.env.CM_PROJECT_KEY,
+    client_id: '*********',
+    client_secret: '*********'
+};
+
+const priceCsvParser = new PriceCsvParser(
+  {
+    debug: process.stdout,
+    error: process.stderr,
+    info: process.stdout,
+    trace: process.stdout,
+  },
+  {
+    config: apiCredentials
+  },
+  {
+    strictMode: true
+  }
+);
+
+priceCsvParser.parse(
+  fs.createReadStream('./input.csv'),
+  fs.createWriteStream('./output.json')
+);
 ```
 
 ## Configuration
-
+The `PriceCsvParser` accepts three objects as arguments:
+- Logger (_required_)
+- API client config (_required_)
+  - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
+- Config (_optional_)
+  - `batchProcessing`: number of CSV rows to handle simultaneously. (_default_: `100`)
+  - `delimiter`: the used CSV delimiter (_default_: `,`)
+  - `strictMode`: wether to parse the CSV strictly (_default_: `true`)
 
 ## Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md) for info on contributing.
