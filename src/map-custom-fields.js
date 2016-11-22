@@ -142,7 +142,6 @@ export default function MapCustomFields () {
       const values = value.split(',')
       const _result = _.map(values, (item) => {
         const _item = item.trim()
-        // TO DO: Add support for LocalizedString
         switch (elementType.name) {
           case 'Number': {
             return this.mapNumber(_item)
