@@ -60,10 +60,16 @@ export default class CsvParserPrice {
       if (_data.value && _data.value.centAmount)
         _data.value.centAmount = parseInt(_data.value.centAmount, 10)
 
-      // Rename groupName to ID for compatibility with product import module
+      // Rename groupName to ID for compatibility with price import module
       if (_data.customerGroup && _data.customerGroup.groupName) {
         _data.customerGroup.id = _data.customerGroup.groupName
         delete _data.customerGroup.groupName
+      }
+
+      // Rename channel key to ID for compatibility with price import module
+      if (_data.channel && _data.channel.key) {
+        _data.channel.id = _data.channel.key
+        delete _data.channel.key
       }
 
       const price = {
