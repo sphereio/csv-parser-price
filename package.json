@@ -4,18 +4,24 @@
   "description": "Module that parses price csv to json",
   "keywords": [
     "commercetools",
-    "nodejs",
     "csv",
-    "json",
-    "parser"
+    "parser",
+    "price",
+    "json"
   ],
   "homepage": "https://github.com/commercetools/csv-parser-price#readme",
   "bugs": "https://github.com/commercetools/csv-parser-price/issues",
   "license": "MIT",
-  "author": {
-    "name": "Abimbola Idowu",
-    "email": "abimbola.idowu@commercetools.de"
-  },
+  "contributors": [
+    {
+      "name": "Abimbola Idowu",
+      "email": "abimbola.idowu@commercetools.de"
+    },
+    {
+      "name": "Selwyn Versteeg",
+      "email": "talk@selwyn.cc"
+    }
+  ],
   "main": "lib/main.js",
   "bin": {
     "csvparserprice": "bin/csvparserprice.js"
