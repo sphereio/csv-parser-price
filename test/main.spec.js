@@ -208,6 +208,25 @@ test(`CsvParserPrice::processData
   })
 })
 
+test(`CsvParserPrice::processData
+  should rename customerGroup.groupName to customerGroup.id
+  for compatibility with product import module`, (t) => {
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const _mockPriceObj = mockPriceObj()
+  delete _mockPriceObj.customType
+  delete _mockPriceObj.customField
+  delete _mockPriceObj.value
+
+  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
+    t.false(result.prices[0].customerGroup.groupName, 'Group name is deleted')
+    t.equal(
+      result.prices[0].customerGroup.id, 'customer-group',
+      'Customer group ID has group name value'
+    )
+    t.end()
+  })
+})
+
 test(`CsvParserPrice::processCustomFields
   should build custom object`, (t) => {
   const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)

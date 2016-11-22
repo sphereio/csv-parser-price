@@ -58,6 +58,13 @@ export default class CsvParserPrice {
     return new Promise((resolve, reject) => {
       if (_data.value && _data.value.centAmount)
         _data.value.centAmount = parseInt(_data.value.centAmount, 10)
+
+      // Rename groupName to ID for compatibility with product import module
+      if (_data.customerGroup && _data.customerGroup.groupName) {
+        _data.customerGroup.id = _data.customerGroup.groupName
+        delete _data.customerGroup.groupName
+      }
+
       const price = {
         sku: _data[CONSTANTS.header.sku],
         prices: [_data],
