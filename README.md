@@ -20,10 +20,10 @@ Options:
 --help, -h        Show help text.                                    [boolean]
 --inputFile, -i   Path to CSV file.                         [default: "stdin"]
 --outputFile, -o  Input CSV file.                          [default: "stdout"]
---batchSize, -b   Amount of CSV rows to handle simultaneously.  [default: 100]
+--batchSize, -b   Number of CSV rows to handle simultaneously.  [default: 100]
 --delimiter, -d   Used CSV delimiter.                           [default: ","]
 --strictMode, -s  Parse CSV strictly.                          [default: true]
---projectKey, -p  API project key.
+--projectKey, -p  API project key.                                  [required]
 --host            HTTP client host parameter.
 --protocol        HTTP client protocol parameter.
 --accessToken     HTTP client access token.

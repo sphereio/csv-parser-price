@@ -67,6 +67,7 @@ Convert commercetools price CSV data to JSON.`
   .option('projectKey', {
     alias: 'p',
     describe: 'API project key.',
+    demand: true,
   })
 
   .option('host', {
