@@ -22,7 +22,7 @@
       "email": "talk@selwyn.cc"
     }
   ],
-  "main": "lib/main.js",
+  "main": "lib/index.js",
   "bin": {
     "csvparserprice": "bin/csvparserprice.js"
   },
