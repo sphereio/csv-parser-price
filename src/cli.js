@@ -5,7 +5,7 @@ import yargs from 'yargs'
 
 import CONSTANTS from './constants'
 import getApiCredentials from './get-api-credentials'
-import PriceCsvParser from './main'
+import CsvParserPrice from './main'
 
 process.title = 'csvparserprice'
 
@@ -91,7 +91,7 @@ args.outputFile
 
 getApiCredentials(args.projectKey, args.accessToken)
   .then(apiCredentials =>
-    new PriceCsvParser(
+    new CsvParserPrice(
       {
         debug: process.stdout,
         error: process.stderr,
@@ -109,6 +109,6 @@ getApiCredentials(args.projectKey, args.accessToken)
       }
     )
   )
-  .then((priceCsvParser) => {
-    priceCsvParser.parse(args.inputFile, args.outputFile)
+  .then((csvParserPrice) => {
+    csvParserPrice.parse(args.inputFile, args.outputFile)
   })

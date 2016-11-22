@@ -31,7 +31,7 @@ Options:
 ### JS
 ```js
 const fs = require('fs');
-const PriceCsvParser = require('csv-parser-price');
+const CsvParserPrice = require('csv-parser-price');
 
 const apiCredentials = {
     project_key: process.env.CM_PROJECT_KEY,
@@ -39,7 +39,7 @@ const apiCredentials = {
     client_secret: '*********'
 };
 
-const priceCsvParser = new PriceCsvParser(
+const csvParserPrice = new CsvParserPrice(
   {
     debug: process.stdout,
     error: process.stderr,
@@ -54,14 +54,14 @@ const priceCsvParser = new PriceCsvParser(
   }
 );
 
-priceCsvParser.parse(
+csvParserPrice.parse(
   fs.createReadStream('./input.csv'),
   fs.createWriteStream('./output.json')
 );
 ```
 
 ## Configuration
-The `PriceCsvParser` accepts three objects as arguments:
+`CsvParserPrice` accepts three objects as arguments:
 - Logger (_required_)
 - API client config (_required_)
   - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.

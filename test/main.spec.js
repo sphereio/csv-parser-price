@@ -4,7 +4,7 @@ import sinon from 'sinon'
 import { SphereClient } from 'sphere-node-sdk'
 import StreamTest from 'streamtest'
 import test from 'tape'
-import PriceCsvParser from 'main'
+import CsvParserPrice from 'main'
 
 import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
 import CONSTANTS from '../src/constants'
@@ -45,36 +45,36 @@ const apiClientConfig = {
   },
 }
 
-test('PriceCsvParser module is a class', (t) => {
-  t.equal(typeof PriceCsvParser, 'function', 'PriceCsvParser is a class')
+test('CsvParserPrice module is a class', (t) => {
+  t.equal(typeof CsvParserPrice, 'function', 'CsvParserPrice is a class')
 
   t.end()
 })
 
-test(`PriceCsvParser
+test(`CsvParserPrice
   should initialize default values`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
 
   t.equal(
-    priceCsvParser.client.constructor,
+    csvParserPrice.client.constructor,
     SphereClient,
     'productType import module is an instanceof SphereClient'
   )
 
   t.equal(
-    priceCsvParser.batchProcessing,
+    csvParserPrice.batchProcessing,
     CONSTANTS.standardOption.batchSize,
     'batchSize should be set to the standard value'
   )
 
   t.equal(
-    priceCsvParser.delimiter,
+    csvParserPrice.delimiter,
     CONSTANTS.standardOption.delimiter,
     'delimiter should be set to the standard value'
   )
 
   t.equal(
-    priceCsvParser.strictMode,
+    csvParserPrice.strictMode,
     CONSTANTS.standardOption.strictMode,
     'strictMode should be set to the standard value'
   )
@@ -82,16 +82,16 @@ test(`PriceCsvParser
   t.end()
 })
 
-test(`PriceCsvParser
+test(`CsvParserPrice
   should throw when options is invalid`, (t) => {
   // eslint-disable-next-line no-new
-  t.throws(() => { new PriceCsvParser(logger, {}) })
+  t.throws(() => { new CsvParserPrice(logger, {}) })
   t.end()
 })
 
-test(`PriceCsvParser::parse
+test(`CsvParserPrice::parse
   should accept a stream and output a stream`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
@@ -101,12 +101,12 @@ test(`PriceCsvParser::parse
     t.ok(prices[0].sku, 'Sku exists on price object')
     t.end()
   })
-  priceCsvParser.parse(readStream, outputStream)
+  csvParserPrice.parse(readStream, outputStream)
 })
 
-test(`PriceCsvParser::parse
+test(`CsvParserPrice::parse
   should group prices by variants sku`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
@@ -118,18 +118,18 @@ test(`PriceCsvParser::parse
     t.ok(prices[0].sku, 'Sku exists on price object')
     t.end()
   })
-  priceCsvParser.parse(readStream, outputStream)
+  csvParserPrice.parse(readStream, outputStream)
 })
 
-test(`PriceCsvParser::processData
+test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
-  sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
     Promise.resolve({ body: _mockCustomTypeDef })
   )
-  priceCsvParser.processData(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
     t.ok(result)
     t.ok(result.sku)
     t.equal(result.prices.length, 1, 'One price object is built')
@@ -154,17 +154,17 @@ test(`PriceCsvParser::processData
   })
 })
 
-test(`PriceCsvParser::processData
+test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
   const _mockCustomTypeDef = mockCustomTypeDef()
-  sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
     Promise.resolve({ body: _mockCustomTypeDef })
   )
-  priceCsvParser.processData(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
     t.ok(result)
     t.ok(result.sku)
     t.equal(result.prices.length, 1, 'One price object is built')
@@ -179,19 +179,19 @@ test(`PriceCsvParser::processData
   })
 })
 
-test(`PriceCsvParser::processData
+test(`CsvParserPrice::processData
   should process object and build valid price object
   if centAmount is not present`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
   delete _mockPriceObj.value
   const _mockCustomTypeDef = mockCustomTypeDef()
-  sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
     Promise.resolve({ body: _mockCustomTypeDef })
   )
-  priceCsvParser.processData(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
     t.ok(result)
     t.ok(result.sku)
     t.equal(result.prices.length, 1, 'One price object is built')
@@ -203,15 +203,15 @@ test(`PriceCsvParser::processData
   })
 })
 
-test(`PriceCsvParser::processCustomFields
+test(`CsvParserPrice::processCustomFields
   should build custom object`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
-  sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
     Promise.resolve({ body: _mockCustomTypeDef })
   )
-  priceCsvParser.processCustomFields(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processCustomFields(_mockPriceObj, 2).then((result) => {
     t.ok(result.fields, 'Custom fields object is present')
     t.ok(result.type, 'CustomObject is present')
     const expected = {
@@ -232,16 +232,16 @@ test(`PriceCsvParser::processCustomFields
   })
 })
 
-test(`PriceCsvParser::processCustomFields
+test(`CsvParserPrice::processCustomFields
   should build report errors on data`, (t) => {
-  const priceCsvParser = new PriceCsvParser(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   _mockPriceObj.customField.priceset = '1,\'2\',3,4'
-  sinon.stub(priceCsvParser, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
     Promise.resolve({ body: _mockCustomTypeDef })
   )
-  priceCsvParser.processCustomFields(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processCustomFields(_mockPriceObj, 2).then((result) => {
     t.fail()
     t.notOk(result)
     t.end()

@@ -8,7 +8,7 @@ import { SphereClient } from 'sphere-node-sdk'
 import CONSTANTS from './constants'
 import MapCustomFields from './map-custom-fields'
 
-export default class PriceCsvParser {
+export default class CsvParserPrice {
   constructor (logger, apiClientConfig = {}, config = {}) {
     this.client = new SphereClient(apiClientConfig)
     this.encoding = 'utf-8'
