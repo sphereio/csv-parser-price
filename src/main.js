@@ -71,12 +71,28 @@ export default class CsvParserPrice {
         .then((customTypeObj) => {
           _data.custom = customTypeObj
           price.prices = [_data]
-          resolve(price)
+          resolve(this.cleanOldData(price))
         })
         .catch(reject)
 
-      return resolve(price)
+      return resolve(this.cleanOldData(price))
     })
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  cleanOldData (data) {
+    const priceObj = data.prices[0]
+    if (priceObj.customType)
+      delete priceObj.customType
+    if (priceObj.customField)
+      delete priceObj.customField
+    if (priceObj['variant-id'])
+      delete priceObj['variant-id']
+    if (priceObj['variant-sku'])
+      delete priceObj['variant-sku']
+    if (priceObj['variant-key'])
+      delete priceObj['variant-key']
+    return data
   }
 
   getCustomTypeDefinition (customTypeKey) {

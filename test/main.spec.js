@@ -139,6 +139,11 @@ test(`CsvParserPrice::processData
       currencyCode: 'EUR',
       centAmount: 4200,
     }, 'Money object built successfully')
+    t.notOk(result.prices[0].customType, 'customType field is removed')
+    t.notOk(result.prices[0].customField, 'customField field is removed')
+    t.notOk(result.prices[0]['variant-sku'], 'variant-sku field is removed')
+    t.notOk(result.prices[0]['variant-id'], 'variant-id field is removed')
+    t.notOk(result.prices[0]['variant-key'], 'variant-key field is removed')
     t.deepEqual(price.custom, {
       type: { id: '795962e6-c0cc-4b4d-84fc-7d8aaed390c0' },
       fields: {
@@ -250,4 +255,24 @@ test(`CsvParserPrice::processCustomFields
     t.equal(error[0], '[row 2: custom-type] - The number \'2\' isn\'t valid')
     t.end()
   })
+})
+
+test(`CsvParserPrice::cleanOldData
+  should delete old data if present`, (t) => {
+  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const _mockPriceObj = mockPriceObj()
+  delete _mockPriceObj['variant-sku']
+  const refinedPrice = {
+    sku: _mockPriceObj['variant-id'],
+    prices: [_mockPriceObj],
+  }
+  t.ok(refinedPrice.prices[0].customField, 'customField field is not cleaned')
+  t.ok(refinedPrice.prices[0].customType, 'customType field is not cleaned')
+  const result = csvParserPrice.cleanOldData(refinedPrice)
+  t.notOk(result.prices[0].customType, 'customType field is removed')
+  t.notOk(result.prices[0].customField, 'customField field is removed')
+  t.notOk(result.prices[0]['variant-sku'], 'variant-sku field is removed')
+  t.notOk(result.prices[0]['variant-id'], 'variant-id field is removed')
+  t.notOk(result.prices[0]['variant-key'], 'variant-key field is removed')
+  t.end()
 })
