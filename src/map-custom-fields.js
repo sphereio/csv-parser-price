@@ -121,7 +121,7 @@ export default function MapCustomFields () {
       if (!isValidValue(value))
         return result
 
-      const matchedMoney = CONSTANTS.field.MONEY.exec(value)
+      const matchedMoney = CONSTANTS.field.money.exec(value)
       if (!matchedMoney) {
         result.error = `Invalid money - Cannot parse money ${value}`
         return result
@@ -183,7 +183,7 @@ export default function MapCustomFields () {
       }, result)
     },
 
-    mapNumber: function mapNumber (rawNo, regEx = CONSTANTS.field.INTEGER) {
+    mapNumber: function mapNumber (rawNo, regEx = CONSTANTS.field.integer) {
       const result = {}
       if (!isValidValue(rawNo))
         return result

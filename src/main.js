@@ -59,7 +59,7 @@ export default class CsvParserPrice {
       if (_data.value && _data.value.centAmount)
         _data.value.centAmount = parseInt(_data.value.centAmount, 10)
       const price = {
-        sku: _data[CONSTANTS.header.SKU],
+        sku: _data[CONSTANTS.header.sku],
         prices: [_data],
       }
 
