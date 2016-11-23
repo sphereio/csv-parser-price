@@ -39,7 +39,49 @@ export default class CsvParserPrice {
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .stopOnError(error => output.emit('error', error))
       .reduce({ prices: [] }, (a, b) => {
-        // This thing really needs a proper comment, MAGIC!
+        /*
+          This reduces all price objects to one object that is acceptable
+          by the price-importer in product-import.
+          It also groups all price object by sku
+          Each price object looks like this:
+          {
+            "sku": "testing",
+            prices: [{
+              value: {
+                "centAmount": 3400,
+                "currencyCode": "EUR"
+              }
+            }]
+          }
+          {
+            "sku": "testing",
+            prices: [{
+              value: {
+                "centAmount": 300,
+                "currencyCode": "EUR"
+              }
+            }]
+          }
+          Resulting object:
+          {
+            "prices": [
+              {
+                "sku": "testing",
+                prices: [{
+                  value: {
+                    "centAmount": 3400,
+                    "currencyCode": "EUR"
+                  }
+                }, {
+                  value: {
+                    "centAmount": 300,
+                    "currencyCode": "EUR"
+                  }
+                }]
+              }
+            ]
+          }
+        */
         if (a.prices.length) {
           const _price = _.find(a.prices, price => price.sku === b.sku)
           if (!_price)
