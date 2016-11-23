@@ -109,10 +109,6 @@ export default class CsvParserPrice {
     return data
   }
 
-  getCustomTypeDefinition (customTypeKey) {
-    return this.client.types.byKey(customTypeKey).fetch()
-  }
-
   processCustomFields (data, rowIndex) {
     return this.getCustomTypeDefinition(data.customType).then((result) => {
       const customTypeDefinition = result.body
@@ -125,3 +121,11 @@ export default class CsvParserPrice {
     })
   }
 }
+
+// Easiest way now to wrap the getCustomTypeDefinition in the memoize method
+// - Abi
+CsvParserPrice.prototype.getCustomTypeDefinition = _.memoize(
+  function _getCustomTypeDefinition (customTypeKey) {
+    return this.client.types.byKey(customTypeKey).fetch()
+  }
+)
