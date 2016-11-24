@@ -8,6 +8,7 @@ import yargs from 'yargs'
 import CONSTANTS from './constants'
 import getApiCredentials from './get-api-credentials'
 import CsvParserPrice from './main'
+import modulePackage from '../package.json'
 
 process.title = 'csvparserprice'
 
@@ -23,6 +24,12 @@ Convert commercetools price CSV data to JSON.`
     alias: 'h',
   })
   .help('help', 'Show help text.')
+
+  .option('version', {
+    alias: 'v',
+    type: 'boolean',
+  })
+  .version('version', 'Show version number.', () => modulePackage.version)
 
   .option('inputFile', {
     alias: 'i',

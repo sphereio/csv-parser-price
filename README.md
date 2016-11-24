@@ -18,6 +18,7 @@ Convert commercetools price CSV data to JSON.
 
 Options:
   --help, -h        Show help text.                                    [boolean]
+  --version, -v     Show version number.                               [boolean]
   --inputFile, -i   Path to CSV file.                         [default: "stdin"]
   --outputFile, -o  Input CSV file.                          [default: "stdout"]
   --batchSize, -b   Number of CSV rows to handle simultaneously.  [default: 100]
