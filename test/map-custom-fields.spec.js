@@ -1,15 +1,15 @@
 import test from 'tape'
-import MapCustomFields from 'map-custom-fields'
+import mapCustomFields from 'map-custom-fields'
 import customType from './helpers/custom-type-definition.mock.json'
 
-test('MapCustomFields should exist', (t) => {
-  t.ok(MapCustomFields)
+test('mapCustomFields should exist', (t) => {
+  t.ok(mapCustomFields)
   t.end()
 })
 
-test('MapCustomFields should be instatianted with methods', (t) => {
-  t.equal(typeof MapCustomFields, 'function', 'MapCustomFields is a function')
-  const mapCustomFields = MapCustomFields()
+test('mapCustomFields should have methods', (t) => {
+  t.equal(typeof mapCustomFields, 'object', 'mapCustomFields is an object')
+
   t.ok(mapCustomFields.mapBoolean, 'mapBoolean method exists')
   t.ok(mapCustomFields.parse, 'parse method exists')
   t.ok(mapCustomFields.mapMoney, 'mapMoney method exists')
@@ -19,16 +19,14 @@ test('MapCustomFields should be instatianted with methods', (t) => {
   t.end()
 })
 
-test(`MapCustomFields::mapBoolean
+test(`mapCustomFields::mapBoolean
   should exists`, (t) => {
-  const mapCustomFields = MapCustomFields()
   t.ok(mapCustomFields.mapBoolean)
   t.end()
 })
 
-test(`MapCustomFields::parse
+test(`mapCustomFields::parse
   should return valid customfields object`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const data = {
     numbertype: '123',
     stringtype: 'nac',
@@ -70,9 +68,8 @@ test(`MapCustomFields::parse
   t.end()
 })
 
-test(`MapCustomFields::parse
+test(`mapCustomFields::parse
   should return errors with customfields object`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const data = {
     numbertype: 'invalid',
     unsupportedType: 'okay',
@@ -119,9 +116,8 @@ test(`MapCustomFields::parse
   t.end()
 })
 
-test(`MapCustomFields::mapBoolean
+test(`mapCustomFields::mapBoolean
   should return boolean value when passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapBoolean('true')
 
   t.notOk(result.error, 'There is no error')
@@ -129,9 +125,8 @@ test(`MapCustomFields::mapBoolean
   t.end()
 })
 
-test(`MapCustomFields::mapBoolean
+test(`mapCustomFields::mapBoolean
   should return no error or data when value is empty`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapBoolean('')
 
   t.notOk(result.error, 'There is no error')
@@ -139,9 +134,8 @@ test(`MapCustomFields::mapBoolean
   t.end()
 })
 
-test(`MapCustomFields::mapBoolean
+test(`mapCustomFields::mapBoolean
   should return error when value is not valid boolean`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapBoolean('{"ok":"yes"}')
 
   t.ok(result.error, 'There are errors with input')
@@ -149,9 +143,8 @@ test(`MapCustomFields::mapBoolean
   t.end()
 })
 
-test(`MapCustomFields::mapBoolean
+test(`mapCustomFields::mapBoolean
   should return error when invalid value is passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapBoolean('abi')
 
   t.ok(result.error, 'There are errors with input')
@@ -159,16 +152,14 @@ test(`MapCustomFields::mapBoolean
   t.end()
 })
 
-test(`MapCustomFields::mapMoney
+test(`mapCustomFields::mapMoney
   should exists`, (t) => {
-  const mapCustomFields = MapCustomFields()
   t.ok(mapCustomFields.mapMoney)
   t.end()
 })
 
-test(`MapCustomFields::mapMoney
+test(`mapCustomFields::mapMoney
   should return money object when passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapMoney('EUR 1400')
 
   t.notOk(result.error, 'There is no error')
@@ -177,9 +168,8 @@ test(`MapCustomFields::mapMoney
   t.end()
 })
 
-test(`MapCustomFields::mapMoney
+test(`mapCustomFields::mapMoney
   should return error when invalid value is passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapMoney('abi')
 
   t.ok(result.error, 'There is error')
@@ -187,9 +177,8 @@ test(`MapCustomFields::mapMoney
   t.end()
 })
 
-test(`MapCustomFields::mapMoney
+test(`mapCustomFields::mapMoney
   should return no error or data when value is empty`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapMoney('')
 
   t.notOk(result.error, 'There is no error')
@@ -197,16 +186,14 @@ test(`MapCustomFields::mapMoney
   t.end()
 })
 
-test(`MapCustomFields::mapNumber
+test(`mapCustomFields::mapNumber
   should exists`, (t) => {
-  const mapCustomFields = MapCustomFields()
   t.ok(mapCustomFields.mapNumber)
   t.end()
 })
 
-test(`MapCustomFields::mapNumber
+test(`mapCustomFields::mapNumber
   should return boolean value when passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapNumber('1400')
 
   t.notOk(result.error, 'There is no error')
@@ -214,9 +201,8 @@ test(`MapCustomFields::mapNumber
   t.end()
 })
 
-test(`MapCustomFields::mapNumber
+test(`mapCustomFields::mapNumber
   should return error when invalid value is passed in`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapNumber('abi')
 
   t.ok(result.error, 'There are errors with input')
@@ -224,9 +210,8 @@ test(`MapCustomFields::mapNumber
   t.end()
 })
 
-test(`MapCustomFields::mapNumber
+test(`mapCustomFields::mapNumber
   should return no error or data when value is empty`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const result = mapCustomFields.mapNumber('')
 
   t.notOk(result.error, 'There is no error')
@@ -235,16 +220,14 @@ test(`MapCustomFields::mapNumber
 })
 
 
-test(`MapCustomFields::mapSet
+test(`mapCustomFields::mapSet
   should exists`, (t) => {
-  const mapCustomFields = MapCustomFields()
   t.ok(mapCustomFields.mapSet)
   t.end()
 })
 
-test(`MapCustomFields::mapSet
+test(`mapCustomFields::mapSet
   should format all values to money`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const elementType = { name: 'Number' }
   const result = mapCustomFields.mapSet('1,2,3,4', elementType)
 
@@ -254,9 +237,8 @@ test(`MapCustomFields::mapSet
   t.end()
 })
 
-test(`MapCustomFields::mapSet
+test(`mapCustomFields::mapSet
   should format all values to money`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const elementType = { name: 'Money' }
   const moneySet = 'EUR 1200,USD 40,NGN 200'
   const result = mapCustomFields.mapSet(moneySet, elementType)
@@ -276,9 +258,8 @@ test(`MapCustomFields::mapSet
   t.end()
 })
 
-test(`MapCustomFields::mapSet
+test(`mapCustomFields::mapSet
   should return error if values in set is invalid`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const elementType = { name: 'Boolean' }
   const moneySet = 'true, false, false, abi'
   const result = mapCustomFields.mapSet(moneySet, elementType)
@@ -288,9 +269,8 @@ test(`MapCustomFields::mapSet
   t.end()
 })
 
-test(`MapCustomFields::mapSet
+test(`mapCustomFields::mapSet
   should return error if elementType in set is not supported`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const elementType = { name: 'unsupportedType' }
   const moneySet = 'true, false, false, abi'
   const result = mapCustomFields.mapSet(moneySet, elementType)
@@ -303,9 +283,8 @@ test(`MapCustomFields::mapSet
   t.end()
 })
 
-test(`MapCustomFields::mapSet
+test(`mapCustomFields::mapSet
   should parse all values as a string`, (t) => {
-  const mapCustomFields = MapCustomFields()
   const elementType = { name: 'String' }
   const moneySet = 'shoe, monitor, abi'
   const result = mapCustomFields.mapSet(moneySet, elementType)

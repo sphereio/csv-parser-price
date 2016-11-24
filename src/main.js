@@ -6,7 +6,7 @@ import highland from 'highland'
 import { SphereClient } from 'sphere-node-sdk'
 
 import CONSTANTS from './constants'
-import MapCustomFields from './map-custom-fields'
+import mapCustomFields from './map-custom-fields'
 
 export default class CsvParserPrice {
   constructor (logger, apiClientConfig, config = {}) {
@@ -15,7 +15,6 @@ export default class CsvParserPrice {
     )
     this.error = []
     this.logger = logger
-    this.mapCustomFields = MapCustomFields()
 
     this.config = config
     this.batchProcessing =
@@ -170,7 +169,7 @@ export default class CsvParserPrice {
       this.logger.info(`Got custom type ${result.body}`)
 
       const customTypeDefinition = result.body
-      const customTypeObj = this.mapCustomFields.parse(
+      const customTypeObj = mapCustomFields.parse(
         data.customField, customTypeDefinition, rowIndex
       )
       if (customTypeObj.error.length)

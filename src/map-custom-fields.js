@@ -1,7 +1,7 @@
 import _ from 'underscore'
 import CONSTANTS from './constants'
 
-export default function MapCustomFields () {
+export default (function MapCustomFields () {
   // Public methods
   return {
     parse,
@@ -203,4 +203,4 @@ export default function MapCustomFields () {
     result.data = parseInt(matchedNumber[0], 10)
     return result
   }
-}
+}())
