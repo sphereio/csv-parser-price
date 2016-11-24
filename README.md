@@ -66,7 +66,7 @@ csvParserPrice.parse(
 - API client config (_required_)
   - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
 - Config (_optional_)
-  - `batchProcessing`: number of CSV rows to handle simultaneously. (_default_: `100`)
+  - `batchSize`: number of CSV rows to handle simultaneously. (_default_: `100`)
   - `delimiter`: the used CSV delimiter (_default_: `,`)
   - `strictMode`: wether to parse the CSV strictly (_default_: `true`)
 

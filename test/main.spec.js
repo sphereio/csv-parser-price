@@ -62,7 +62,7 @@ test(`CsvParserPrice
   )
 
   t.equal(
-    csvParserPrice.batchProcessing,
+    csvParserPrice.batchSize,
     CONSTANTS.standardOption.batchSize,
     'batchSize should be set to the standard value'
   )

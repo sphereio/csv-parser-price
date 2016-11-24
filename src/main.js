@@ -17,7 +17,7 @@ export default class CsvParserPrice {
     this.logger = logger
 
     this.config = config
-    this.batchProcessing =
+    this.batchSize =
       this.config.batchSize || CONSTANTS.standardOption.batchSize
     this.delimiter =
       this.config.delimiter || CONSTANTS.standardOption.delimiter
@@ -30,15 +30,22 @@ export default class CsvParserPrice {
     let rowIndex = 1
 
     highland(input)
+      // Parse CSV return each row as object
       .through(csv({
         separator: this.delimiter,
         strict: this.strictMode,
       }))
+      // Limit amount of rows to be handled at the same time
+      // Returns an array aka 'batch' of given rows
+      .batch(this.batchSize)
       .stopOnError(error => this.logger.error(error))
       .doto(() => {
         this.logger.verbose(`Parsed row ${rowIndex}`)
         rowIndex += 1
       })
+      // Flatten batch of rows
+      .flatMap(highland)
+      // Unflatten object keys with a dot to nested values
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
