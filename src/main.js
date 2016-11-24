@@ -10,7 +10,9 @@ import MapCustomFields from './map-custom-fields'
 
 export default class CsvParserPrice {
   constructor (logger, apiClientConfig, config = {}) {
-    this.client = new SphereClient(apiClientConfig)
+    this.client = new SphereClient(
+      Object.assign(apiClientConfig, { user_agent: 'csv-parser-price' })
+    )
     this.error = []
     this.logger = logger
     this.mapCustomFields = MapCustomFields()
