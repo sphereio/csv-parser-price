@@ -41,10 +41,10 @@ const apiCredentials = {
 
 const csvParserPrice = new CsvParserPrice(
   {
-    debug: process.stdout,
-    error: process.stderr,
-    info: process.stdout,
-    trace: process.stdout,
+    error: process.stderr.write.bind(process.stderr),
+    warn: process.stderr.write.bind(process.stderr),
+    info: process.stdout.write.bind(process.stdout),
+    verbose: process.stdout.write.bind(process.stdout),
   },
   {
     config: apiCredentials
@@ -62,7 +62,7 @@ csvParserPrice.parse(
 
 ## Configuration
 `CsvParserPrice` accepts three objects as arguments:
-- Logger (_required_)
+- Logger takes object with four functions (_required_)
 - API client config (_required_)
   - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
 - Config (_optional_)

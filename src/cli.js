@@ -1,6 +1,8 @@
 'use strict'
 
 import fs from 'fs'
+import log from 'npmlog'
+import PrettyError from 'pretty-error'
 import yargs from 'yargs'
 
 import CONSTANTS from './constants'
@@ -43,6 +45,9 @@ Convert commercetools price CSV data to JSON.`
     if (arg !== 'stdout')
       return fs.createWriteStream(String(arg))
 
+    // No output file given, log to file to not disturb stdout/stderr
+    log.stream = fs.createWriteStream('csvparserprice.log')
+
     return process.stdout
   })
 
@@ -81,23 +86,31 @@ Convert commercetools price CSV data to JSON.`
   .option('accessToken', {
     describe: 'HTTP client access token.',
   })
+
+  .option('logLevel', {
+    default: 'info',
+    describe: 'Logging level: error, warn, info or verbose.',
+  })
+  .coerce('logLevel', (arg) => {
+    log.level = arg
+  })
   .argv
 
-// Handle an error by logging and exiting the process
-args.outputFile
-  .on('error', (error) => {
-    process.stderr.write(error.message)
-    process.exit(1)
-  })
+const errorHandler = (message) => {
+  const errorFormatter = new PrettyError()
+  const error = errorFormatter.render(message)
+  log.error('', error)
+  process.exit(1)
+}
 
 getApiCredentials(args.projectKey, args.accessToken)
   .then(apiCredentials =>
     new CsvParserPrice(
       {
-        debug: process.stdout,
-        error: process.stderr,
-        info: process.stdout,
-        trace: process.stdout,
+        error: errorHandler,
+        warn: message => log.warn('', message),
+        info: message => log.info('', message),
+        verbose: message => log.verbose('', message),
       },
       {
         config: apiCredentials,

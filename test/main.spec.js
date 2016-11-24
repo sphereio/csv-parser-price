@@ -10,10 +10,10 @@ import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
 import CONSTANTS from '../src/constants'
 
 const logger = {
-  trace: process.stdout,
-  debug: process.stdout,
-  info: process.stdout,
-  error: process.stderr,
+  error: process.stderr.write.bind(process.stderr),
+  warn: process.stderr.write.bind(process.stderr),
+  info: process.stdout.write.bind(process.stdout),
+  verbose: process.stdout.write.bind(process.stdout),
 }
 
 let PROJECT_KEY

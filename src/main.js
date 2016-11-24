@@ -26,6 +26,7 @@ export default class CsvParserPrice {
   }
 
   parse (input, output) {
+    this.logger.info('Starting convertion')
     let rowIndex = 1
 
     highland(input)
@@ -33,11 +34,15 @@ export default class CsvParserPrice {
         separator: this.delimiter,
         strict: this.strictMode,
       }))
-      .stopOnError(error => output.emit('error', error))
-      .doto(() => (rowIndex += 1))
+      .stopOnError(error => this.logger.error(error))
+      .doto(() => {
+        this.logger.verbose(`Parsed row ${rowIndex}`)
+        rowIndex += 1
+      })
       .map(unflatten)
       .flatMap(data => highland(this.processData(data, rowIndex)))
-      .stopOnError(error => output.emit('error', error))
+      .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
+      .stopOnError(error => this.logger.error(error))
       .reduce({ prices: [] }, (a, b) => {
         /*
           This reduces all price objects to one object that is acceptable
@@ -92,6 +97,10 @@ export default class CsvParserPrice {
           a.prices.push(b)
         return a
       })
+      .doto((data) => {
+        const numberOfPrices = Number(JSON.stringify(data.prices.length)) + 1
+        this.logger.info(`Done with convertion of ${numberOfPrices} prices`)
+      })
       .pipe(JSONStream.stringify(false))
       .pipe(output)
   }
@@ -119,17 +128,17 @@ export default class CsvParserPrice {
         prices: [_data],
       }
 
-      if (data.customType)
-        return this.processCustomFields(
-          data,
-          rowIndex
-        )
-        .then((customTypeObj) => {
-          _data.custom = customTypeObj
-          price.prices = [_data]
-          resolve(this.cleanOldData(price))
-        })
-        .catch(reject)
+      if (data.customType) {
+        this.logger.verbose('Found custom type')
+
+        return this.processCustomFields(data, rowIndex)
+          .then((customTypeObj) => {
+            _data.custom = customTypeObj
+            price.prices = [_data]
+            resolve(this.cleanOldData(price))
+          })
+          .catch(reject)
+      }
 
       return resolve(this.cleanOldData(price))
     })
@@ -137,6 +146,8 @@ export default class CsvParserPrice {
 
   // eslint-disable-next-line class-methods-use-this
   cleanOldData (data) {
+    this.logger.warn('Cleaning leftover data')
+
     const priceObj = data.prices[0]
     if (priceObj.customType)
       delete priceObj.customType
@@ -152,7 +163,11 @@ export default class CsvParserPrice {
   }
 
   processCustomFields (data, rowIndex) {
+    this.logger.verbose(`Found custom type at row ${rowIndex}`)
+
     return this.getCustomTypeDefinition(data.customType).then((result) => {
+      this.logger.info(`Got custom type ${result.body}`)
+
       const customTypeDefinition = result.body
       const customTypeObj = this.mapCustomFields.parse(
         data.customField, customTypeDefinition, rowIndex

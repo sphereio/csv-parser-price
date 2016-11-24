@@ -57,14 +57,14 @@ test('CLI given a non-existant input file', (t) => {
 
 test('CLI exits on faulty CSV format', (t) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
+  const jsonFilePath = tmp.fileSync().name
 
-  exec(`${binPath} -i ${csvFilePath} -p ${PROJECT_KEY}`,
+  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
-      t.equal(
-        stderr,
-        'Row length does not match headers',
+      t.true(
+        stderr.match(/Row length does not match headers/),
         'returns CSV parsing error on stderr'
       )
       t.end()
@@ -74,8 +74,9 @@ test('CLI exits on faulty CSV format', (t) => {
 
 test('CLI exits on parsing errors', (t) => {
   const csvFilePath = './test/helpers/sample.csv'
+  const jsonFilePath = tmp.fileSync().name
 
-  exec(`${binPath} -i ${csvFilePath} -p ${PROJECT_KEY}`,
+  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
