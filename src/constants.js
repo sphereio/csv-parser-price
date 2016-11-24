@@ -15,6 +15,8 @@ const CONSTANTS = {
   },
 }
 
-Object.freeze(CONSTANTS)
+Object.keys(CONSTANTS).forEach((key) => {
+  Object.freeze(CONSTANTS[key])
+})
 
 export default CONSTANTS
