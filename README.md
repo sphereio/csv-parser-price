@@ -9,7 +9,7 @@
 Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON.
 
 ## Usage
-`npm install csv-parser-price`
+`npm install csv-parser-price --global`
 
 ### CLI
 ```
@@ -17,17 +17,21 @@ Usage: csvparserprice [options]
 Convert commercetools price CSV data to JSON.
 
 Options:
---help, -h        Show help text.                                    [boolean]
---inputFile, -i   Path to CSV file.                         [default: "stdin"]
---outputFile, -o  Input CSV file.                          [default: "stdout"]
---batchSize, -b   Number of CSV rows to handle simultaneously.  [default: 100]
---delimiter, -d   Used CSV delimiter.                           [default: ","]
---strictMode, -s  Parse CSV strictly.                          [default: true]
---projectKey, -p  API project key.                                  [required]
---host            HTTP client host parameter.
---protocol        HTTP client protocol parameter.
---accessToken     HTTP client access token.
+  --help, -h        Show help text.                                    [boolean]
+  --inputFile, -i   Path to CSV file.                         [default: "stdin"]
+  --outputFile, -o  Input CSV file.                          [default: "stdout"]
+  --batchSize, -b   Number of CSV rows to handle simultaneously.  [default: 100]
+  --delimiter, -d   Used CSV delimiter.                           [default: ","]
+  --strictMode, -s  Parse CSV strictly.                          [default: true]
+  --projectKey, -p  API project key.                                  [required]
+  --host            HTTP client host parameter.
+  --protocol        HTTP client protocol parameter.
+  --accessToken     HTTP client access token.
+  --logLevel        Logging level: error, warn, info or verbose.
+                                                               [default: "info"]
 ```
+When running with `--outputFile` set, logging information is shown directly otherwise it goes to `csvparserprice.log`.
+
 ### JS
 ```js
 const fs = require('fs');
@@ -41,10 +45,10 @@ const apiCredentials = {
 
 const csvParserPrice = new CsvParserPrice(
   {
-    error: process.stderr.write.bind(process.stderr),
-    warn: process.stderr.write.bind(process.stderr),
-    info: process.stdout.write.bind(process.stdout),
-    verbose: process.stdout.write.bind(process.stdout),
+    error: console.error,
+    warn: console.warn,
+    info: console.log,
+    verbose: console.log,
   },
   {
     config: apiCredentials

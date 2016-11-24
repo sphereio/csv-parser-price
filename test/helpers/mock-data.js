@@ -1,8 +1,6 @@
 exports.mockPriceObj = function mockPriceObj () {
   return {
-    'variant-id': '123',
     'variant-sku': 'my-price',
-    'variant-key': 'my-price-key',
     value: { currencyCode: 'EUR', centAmount: '4200' },
     country: 'DE',
     customerGroup: { groupName: 'customer-group' },

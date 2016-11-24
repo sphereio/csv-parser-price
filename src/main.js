@@ -26,7 +26,7 @@ export default class CsvParserPrice {
   }
 
   parse (input, output) {
-    this.logger.info('Starting conversion')
+    this.logger.verbose('Starting conversion')
     let rowIndex = 1
 
     highland(input)
@@ -106,7 +106,7 @@ export default class CsvParserPrice {
       })
       .doto((data) => {
         const numberOfPrices = Number(JSON.stringify(data.prices.length)) + 1
-        this.logger.info(`Done with convertion of ${numberOfPrices} prices`)
+        this.logger.info(`Done with conversion of ${numberOfPrices} prices`)
       })
       .pipe(JSONStream.stringify(false))
       .pipe(output)
@@ -160,12 +160,8 @@ export default class CsvParserPrice {
       delete priceObj.customType
     if (priceObj.customField)
       delete priceObj.customField
-    if (priceObj['variant-id'])
-      delete priceObj['variant-id']
     if (priceObj[CONSTANTS.header.sku])
       delete priceObj[CONSTANTS.header.sku]
-    if (priceObj['variant-key'])
-      delete priceObj['variant-key']
     return data
   }
 

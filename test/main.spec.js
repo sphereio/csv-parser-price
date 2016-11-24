@@ -142,8 +142,6 @@ test(`CsvParserPrice::processData
     t.notOk(price.customType, 'customType field is removed')
     t.notOk(price.customField, 'customField field is removed')
     t.notOk(price[CONSTANTS.header.sku], 'variant-sku field is removed')
-    t.notOk(price['variant-id'], 'variant-id field is removed')
-    t.notOk(price['variant-key'], 'variant-key field is removed')
     t.deepEqual(price.custom, {
       type: { id: '795962e6-c0cc-4b4d-84fc-7d8aaed390c0' },
       fields: {
@@ -301,7 +299,7 @@ test(`CsvParserPrice::cleanOldData
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj[CONSTANTS.header.sku]
   const refinedPrice = {
-    sku: _mockPriceObj['variant-id'],
+    sku: _mockPriceObj[CONSTANTS.header.sku],
     prices: [_mockPriceObj],
   }
   t.ok(refinedPrice.prices[0].customField, 'customField field is not cleaned')
@@ -309,8 +307,9 @@ test(`CsvParserPrice::cleanOldData
   const result = csvParserPrice.cleanOldData(refinedPrice)
   t.notOk(result.prices[0].customType, 'customType field is removed')
   t.notOk(result.prices[0].customField, 'customField field is removed')
-  t.notOk(result.prices[0]['variant-sku'], 'variant-sku field is removed')
-  t.notOk(result.prices[0][CONSTANTS.header.sku], 'variant-id field is removed')
-  t.notOk(result.prices[0]['variant-key'], 'variant-key field is removed')
+  t.notOk(
+    result.prices[0][CONSTANTS.header.sku],
+    'variant-sku field is removed'
+  )
   t.end()
 })
