@@ -187,8 +187,7 @@ export default class CsvParserPrice {
   }
 }
 
-// Easiest way now to wrap the getCustomTypeDefinition in the memoize method
-// - Abi
+// Easiest way to wrap the getCustomTypeDefinition in the memoize method
 CsvParserPrice.prototype.getCustomTypeDefinition = _.memoize(
   function _getCustomTypeDefinition (customTypeKey) {
     return this.client.types.byKey(customTypeKey).fetch()
