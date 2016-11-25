@@ -2,6 +2,7 @@ import fs from 'fs'
 import test from 'tape'
 import tmp from 'tmp'
 import { exec } from 'child_process'
+import { version } from '../../package.json'
 
 const binPath = './bin/csvparserprice.js'
 
@@ -14,6 +15,14 @@ else
 test('CLI help flag', (t) => {
   exec(`${binPath} --help`, (error, stdout, stderr) => {
     t.true(String(stdout).match(/help/), 'outputs help text')
+    t.false(error && stderr, 'returns no error')
+    t.end()
+  })
+})
+
+test('CLI version flag', (t) => {
+  exec(`${binPath} --version`, (error, stdout, stderr) => {
+    t.equal(stdout, `${version}\n`, 'outputs current version number')
     t.false(error && stderr, 'returns no error')
     t.end()
   })
