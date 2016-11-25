@@ -6,15 +6,13 @@ import { unflatten } from 'flat'
 import _ from 'underscore'
 
 import CONSTANTS from './constants'
+import userAgent from './user-agent'
 import mapCustomFields from './map-custom-fields'
-import { version } from '../package.json'
 
 export default class CsvParserPrice {
   constructor (apiClientConfig, logger, config = {}) {
     this.client = new SphereClient(
-      Object.assign(apiClientConfig, {
-        user_agent: `csv-parser-price/${version} Node.js/${process.version}`,
-      })
+      Object.assign(apiClientConfig, { user_agent: userAgent })
     )
 
     this.logger = logger || {

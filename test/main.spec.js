@@ -59,7 +59,7 @@ test(`CsvParserPrice
   t.equal(
     csvParserPrice.client.constructor,
     SphereClient,
-    'productType import module is an instanceof SphereClient'
+    'csvParserPrice module is an instanceof SphereClient'
   )
 
   // logger
