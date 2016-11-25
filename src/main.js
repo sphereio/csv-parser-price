@@ -14,7 +14,12 @@ export default class CsvParserPrice {
       Object.assign(apiClientConfig, { user_agent: 'csv-parser-price' })
     )
     this.error = []
-    this.logger = logger
+    this.logger = logger || {
+      error: console.error,
+      warn: console.warn,
+      info: console.log,
+      verbose: console.log,
+    }
 
     this.config = config
     this.batchSize =

@@ -67,7 +67,7 @@ csvParserPrice.parse(
 
 ## Configuration
 `CsvParserPrice` accepts three objects as arguments:
-- Logger takes object with four functions (_required_)
+- Logger takes object with four functions (_optional_)
 - API client config (_required_)
   - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
 - Config (_optional_)
