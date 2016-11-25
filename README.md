@@ -9,7 +9,7 @@
 Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON.
 
 ## Usage
-`npm install csv-parser-price --global`
+`npm install @commercetools/csv-parser-price --global`
 
 ### CLI
 ```
