@@ -7,13 +7,16 @@ import _ from 'underscore'
 
 import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'
+import { version } from '../package.json'
 
 export default class CsvParserPrice {
   constructor (apiClientConfig, logger, config = {}) {
     this.client = new SphereClient(
-      Object.assign(apiClientConfig, { user_agent: 'csv-parser-price' })
+      Object.assign(apiClientConfig, {
+        user_agent: `csv-parser-price/${version} Node.js/${process.version}`,
+      })
     )
-    this.error = []
+
     this.logger = logger || {
       error: process.stderr,
       warn: process.stderr,
