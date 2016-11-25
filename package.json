@@ -1,57 +1,63 @@
 {
-  "name": "csv-parser-price",
+  "name": "@commercetools/csv-parser-price",
   "version": "1.0.0",
   "description": "Module that parses price csv to json",
   "keywords": [
     "commercetools",
-    "nodejs",
     "csv",
-    "json",
     "parser",
-    "sphereio"
+    "price",
+    "json"
   ],
   "homepage": "https://github.com/commercetools/csv-parser-price#readme",
   "bugs": "https://github.com/commercetools/csv-parser-price/issues",
   "license": "MIT",
-  "author": {
-    "name": "Abimbola Idowu",
-    "email": "abimbola.idowu@commercetools.de"
+  "contributors": [
+    {
+      "name": "Abimbola Idowu",
+      "email": "abimbola.idowu@commercetools.de"
+    },
+    {
+      "name": "Selwyn Versteeg",
+      "email": "selwyn.versteeg@commercetools.de"
+    }
+  ],
+  "main": "lib/index.js",
+  "bin": {
+    "csvparserprice": "bin/csvparserprice.js"
   },
-  "main": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/commercetools/csv-parser-price.git"
   },
   "scripts": {
     "start": "npm run test:watch",
-    "test": "cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
-    "test:watch": "chokidar src test  bin-c 'npm test'",
-    "build": "npm run clean && babel src -d lib",
+    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
+    "test:watch": "chokidar src test bin -c 'npm test'",
+    "build": "npm run clean && babel src bin -d lib",
     "clean": "rimraf lib/*",
     "commit": "git-cz",
     "codecov": "cat ./coverage/lcov.info | codecov",
-    "coverage": "npm run lint && npm run clean && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
+    "coverage": "npm run lint npm run build && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
     "coverage:html": "npm run lint && cross-env NODE_ENV=test nyc --reporter=html npm test",
     "lint": "./scripts/lint src test"
   },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    },
-    "ghooks": {
-      "commit-msg": "validate-commit-msg",
-      "pre-commit": "./scripts/lint-staged-files && npm test"
-    }
+  "engines": {
+    "node": ">= 4.5.0"
   },
-  "eslintConfig": {
-    "extends": "commercetools",
-    "settings": {
-      "import/resolver": {
-        "node": {
-          "paths": ["src/"]
-        }
-      }
-    }
+  "dependencies": {
+    "JSONStream": "^1.2.1",
+    "bluebird": "^3.4.6",
+    "csv-parser": "^1.11.0",
+    "flat": "^2.0.1",
+    "highland": "^2.10.1",
+    "npmlog": "^4.0.1",
+    "pretty-error": "^2.0.2",
+    "sphere-node-sdk": "^1.16.0",
+    "sphere-node-utils": "^0.8.6",
+    "underscore": "^1.8.3",
+    "underscore-mixins": "^0.1.4",
+    "yargs": "^6.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.14.0",
@@ -73,12 +79,33 @@
     "ghooks": "^1.3.2",
     "nyc": "^8.1.0",
     "rimraf": "^2.5.4",
+    "sinon": "^1.17.6",
+    "streamtest": "^1.2.2",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0",
+    "tmp": "^0.0.31",
     "validate-commit-msg": "^2.8.0"
   },
-  "engines": {
-    "node": ">= 4.5.0"
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    },
+    "ghooks": {
+      "commit-msg": "validate-commit-msg",
+      "pre-commit": "./scripts/lint-staged-files"
+    }
+  },
+  "eslintConfig": {
+    "extends": "commercetools",
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "paths": [
+            "src/"
+          ]
+        }
+      }
+    }
   },
   "nyc": {
     "include": [

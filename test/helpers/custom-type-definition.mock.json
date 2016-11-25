@@ -1,0 +1,96 @@
+{
+  "key": "my-category",
+  "id": "123456789",
+  "fieldDefinitions": [
+    {
+      "name": "stringtype",
+      "type": {
+        "name": "String"
+      }
+    },
+    {
+      "name": "booleantype",
+      "type": {
+        "name": "Boolean"
+      }
+    },
+    {
+      "name": "unsupportedType",
+      "type": {
+        "name": "unsupported"
+      }
+    },
+    {
+      "name": "money",
+      "type": {
+        "name": "Money"
+      }
+    },
+    {
+      "name": "numbertype",
+      "type": {
+        "name": "Number"
+      }
+    },
+    {
+      "name": "localizedstringtype",
+      "type": {
+        "name": "LocalizedString"
+      }
+    },
+    {
+      "name": "enumtype",
+      "type": {
+        "name": "Enum",
+        "values": [
+          {
+            "key": "en",
+            "label": "okay"
+          }
+        ]
+      }
+    },
+    {
+      "name": "localizedenumtype",
+      "type": {
+        "name": "LocalizedEnum",
+        "values": [
+          {
+            "key": "enwew",
+            "label": {
+              "de": "Hundefutter",
+              "en": "dog food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "settype",
+      "type": {
+        "name": "Set",
+        "elementType": {
+          "name": "Number"
+        }
+      }
+    },
+    {
+      "name": "datetype",
+      "type": {
+        "name": "Date"
+      }
+    },
+    {
+      "name": "datetimetype",
+      "type": {
+        "name": "DateTime"
+      }
+    },
+    {
+      "name": "time",
+      "type": {
+        "name": "Time"
+      }
+    }
+  ]
+}

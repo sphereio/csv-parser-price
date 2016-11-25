@@ -1,28 +1,82 @@
-<!-- This is the readme template for commercetools nodejs projects. We recommend you following this format when writing a readme project -->
 [![commercetools logo][commercetools-icon]][commercetools]
 
-# Unslugified Project Title
+# CSV Parser Price
 [![Travis Build Status][travis-icon]][travis]
 [![Codecov Coverage Status][codecov-icon]][codecov]
 [![David Dependencies Status][david-icon]][david]
 [![David devDependencies Status][david-dev-icon]][david-dev]
 
-A short description of what this project is about and it's core features. This might be followed by some points to clarify:
-- Do something with this
-- Supports other stuff
+Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON.
 
 ## Usage
-How to use this project, possibly with a small code example. Could be split into CLI and direct usage.
+`npm install csv-parser-price --global`
+
 ### CLI
-...
+```
+Usage: csvparserprice [options]
+Convert commercetools price CSV data to JSON.
+
+Options:
+  --help, -h        Show help text.                                    [boolean]
+  --version, -v     Show version number.                               [boolean]
+  --inputFile, -i   Path to CSV file.                         [default: "stdin"]
+  --outputFile, -o  Input CSV file.                          [default: "stdout"]
+  --batchSize, -b   Number of CSV rows to handle simultaneously.  [default: 100]
+  --delimiter, -d   Used CSV delimiter.                           [default: ","]
+  --strictMode, -s  Parse CSV strictly.                          [default: true]
+  --projectKey, -p  API project key.                                  [required]
+  --host            HTTP client host parameter.
+  --protocol        HTTP client protocol parameter.
+  --accessToken     HTTP client access token.
+  --logLevel        Logging level: error, warn, info or verbose.
+                                                               [default: "info"]
+```
+When running with `--outputFile` set, logging information is shown directly otherwise it goes to `csvparserprice.log`.
+
 ### JS
-...
+```js
+const fs = require('fs');
+const CsvParserPrice = require('csv-parser-price');
+
+const apiCredentials = {
+    project_key: process.env.CM_PROJECT_KEY,
+    client_id: '*********',
+    client_secret: '*********'
+};
+
+const csvParserPrice = new CsvParserPrice(
+  {
+    config: apiCredentials
+  },
+  {
+    error: console.error,
+    warn: console.warn,
+    info: console.log,
+    verbose: console.log,
+  },
+  {
+    strictMode: true
+  }
+);
+
+csvParserPrice.parse(
+  fs.createReadStream('./input.csv'),
+  fs.createWriteStream('./output.json')
+);
+```
 
 ## Configuration
-Options to choose from if there are any should be listed inside this file.
+`CsvParserPrice` accepts three objects as arguments:
+- API client config (_required_)
+  - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
+- Logger takes object with four functions (_optional_)
+- Config (_optional_)
+  - `batchSize`: number of CSV rows to handle simultaneously. (_default_: `100`)
+  - `delimiter`: the used CSV delimiter (_default_: `,`)
+  - `strictMode`: wether to parse the CSV strictly (_default_: `true`)
 
 ## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md) for info on contributing to eslint-config
+See [CONTRIBUTING.md](CONTRIBUTING.md) for info on contributing.
 
 [commercetools]: https://commercetools.com/
 [commercetools-icon]: https://cdn.rawgit.com/commercetools/press-kit/master/PNG/72DPI/CT%20logo%20horizontal%20RGB%2072dpi.png
