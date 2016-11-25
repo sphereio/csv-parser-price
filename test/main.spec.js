@@ -53,30 +53,32 @@ test('CsvParserPrice module is a class', (t) => {
 
 test(`CsvParserPrice
   should initialize default values`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig)
 
+  // apiClientConfig
   t.equal(
     csvParserPrice.client.constructor,
     SphereClient,
     'productType import module is an instanceof SphereClient'
   )
 
+  // logger
+  t.deepEqual(
+    csvParserPrice.logger,
+    {
+      error: process.stderr,
+      warn: process.stderr,
+      info: process.stdout,
+      verbose: process.stdout,
+    },
+    'logger should be set to the standard value'
+  )
+
+  // config
   t.equal(
     csvParserPrice.batchSize,
     CONSTANTS.standardOption.batchSize,
-    'batchSize should be set to the standard value'
-  )
-
-  t.equal(
-    csvParserPrice.delimiter,
-    CONSTANTS.standardOption.delimiter,
-    'delimiter should be set to the standard value'
-  )
-
-  t.equal(
-    csvParserPrice.strictMode,
-    CONSTANTS.standardOption.strictMode,
-    'strictMode should be set to the standard value'
+    'parser option should be set to the standard value'
   )
 
   t.end()
@@ -91,7 +93,7 @@ test(`CsvParserPrice
 
 test(`CsvParserPrice::parse
   should accept a stream and output a stream`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
@@ -106,7 +108,7 @@ test(`CsvParserPrice::parse
 
 test(`CsvParserPrice::parse
   should group prices by variants sku`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
@@ -123,7 +125,7 @@ test(`CsvParserPrice::parse
 
 test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
@@ -159,7 +161,7 @@ test(`CsvParserPrice::processData
 
 test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
@@ -185,7 +187,7 @@ test(`CsvParserPrice::processData
 test(`CsvParserPrice::processData
   should process object and build valid price object
   if centAmount is not present`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
@@ -209,7 +211,7 @@ test(`CsvParserPrice::processData
 test(`CsvParserPrice::processData
   should rename customerGroup.groupName to customerGroup.id
   for compatibility with product price import module`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
@@ -228,7 +230,7 @@ test(`CsvParserPrice::processData
 test(`CsvParserPrice::processData
   should rename channel.key to channel.id
   for compatibility with product price import module`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj.customType
   delete _mockPriceObj.customField
@@ -246,7 +248,7 @@ test(`CsvParserPrice::processData
 
 test(`CsvParserPrice::processCustomFields
   should build custom object`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
@@ -275,7 +277,7 @@ test(`CsvParserPrice::processCustomFields
 
 test(`CsvParserPrice::processCustomFields
   should build report errors on data`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   const _mockCustomTypeDef = mockCustomTypeDef()
   _mockPriceObj.customField.priceset = '1,\'2\',3,4'
@@ -295,7 +297,7 @@ test(`CsvParserPrice::processCustomFields
 
 test(`CsvParserPrice::cleanOldData
   should delete old data if present`, (t) => {
-  const csvParserPrice = new CsvParserPrice(logger, apiClientConfig)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const _mockPriceObj = mockPriceObj()
   delete _mockPriceObj[CONSTANTS.header.sku]
   const refinedPrice = {

@@ -46,13 +46,13 @@ const apiCredentials = {
 
 const csvParserPrice = new CsvParserPrice(
   {
+    config: apiCredentials
+  },
+  {
     error: console.error,
     warn: console.warn,
     info: console.log,
     verbose: console.log,
-  },
-  {
-    config: apiCredentials
   },
   {
     strictMode: true
@@ -67,9 +67,9 @@ csvParserPrice.parse(
 
 ## Configuration
 `CsvParserPrice` accepts three objects as arguments:
-- Logger takes object with four functions (_optional_)
 - API client config (_required_)
   - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
+- Logger takes object with four functions (_optional_)
 - Config (_optional_)
   - `batchSize`: number of CSV rows to handle simultaneously. (_default_: `100`)
   - `delimiter`: the used CSV delimiter (_default_: `,`)

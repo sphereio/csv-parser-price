@@ -114,16 +114,16 @@ getApiCredentials(args.projectKey, args.accessToken)
   .then(apiCredentials =>
     new CsvParserPrice(
       {
-        error: errorHandler,
-        warn: message => log.warn('', message),
-        info: message => log.info('', message),
-        verbose: message => log.verbose('', message),
-      },
-      {
         config: apiCredentials,
         host: args.host,
         protocol: args.protocol,
         access_token: args.accessToken,
+      },
+      {
+        error: errorHandler,
+        warn: message => log.warn('', message),
+        info: message => log.info('', message),
+        verbose: message => log.verbose('', message),
       },
       {
         delimiter: args.delimiter,

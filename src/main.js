@@ -9,16 +9,16 @@ import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'
 
 export default class CsvParserPrice {
-  constructor (logger, apiClientConfig, config = {}) {
+  constructor (apiClientConfig, logger, config = {}) {
     this.client = new SphereClient(
       Object.assign(apiClientConfig, { user_agent: 'csv-parser-price' })
     )
     this.error = []
     this.logger = logger || {
-      error: console.error,
-      warn: console.warn,
-      info: console.log,
-      verbose: console.log,
+      error: process.stderr,
+      warn: process.stderr,
+      info: process.stdout,
+      verbose: process.stdout,
     }
 
     this.config = config
