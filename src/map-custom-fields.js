@@ -1,4 +1,5 @@
 import _ from 'underscore'
+
 import CONSTANTS from './constants'
 
 export default (function MapCustomFields () {

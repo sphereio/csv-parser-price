@@ -1,7 +1,8 @@
+import { exec } from 'child_process'
 import fs from 'fs'
 import test from 'tape'
 import tmp from 'tmp'
-import { exec } from 'child_process'
+
 import { version } from '../../package.json'
 
 const binPath = './bin/csvparserprice.js'

@@ -1,5 +1,5 @@
-import test from 'tape'
 import getApiCredentials from 'get-api-credentials'
+import test from 'tape'
 
 let PROJECT_KEY
 if (process.env.CI === 'true')

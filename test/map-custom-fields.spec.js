@@ -1,5 +1,6 @@
-import test from 'tape'
 import mapCustomFields from 'map-custom-fields'
+import test from 'tape'
+
 import customType from './helpers/custom-type-definition.mock.json'
 
 test('mapCustomFields should exist', (t) => {

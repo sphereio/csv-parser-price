@@ -1,9 +1,9 @@
-import JSONStream from 'JSONStream'
-import _ from 'underscore'
 import csv from 'csv-parser'
-import { unflatten } from 'flat'
 import highland from 'highland'
+import JSONStream from 'JSONStream'
 import { SphereClient } from 'sphere-node-sdk'
+import { unflatten } from 'flat'
+import _ from 'underscore'
 
 import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'

@@ -1,13 +1,13 @@
+import CsvParserPrice from 'main'
 import fs from 'fs'
 import path from 'path'
-import sinon from 'sinon'
 import { SphereClient } from 'sphere-node-sdk'
+import sinon from 'sinon'
 import StreamTest from 'streamtest'
 import test from 'tape'
-import CsvParserPrice from 'main'
 
-import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
 import CONSTANTS from '../src/constants'
+import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
 
 const logger = {
   error: () => {},

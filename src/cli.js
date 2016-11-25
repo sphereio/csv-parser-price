@@ -1,13 +1,11 @@
-'use strict'
-
 import fs from 'fs'
 import log from 'npmlog'
 import PrettyError from 'pretty-error'
 import yargs from 'yargs'
 
 import CONSTANTS from './constants'
-import getApiCredentials from './get-api-credentials'
 import CsvParserPrice from './main'
+import getApiCredentials from './get-api-credentials'
 import { version } from '../package.json'
 
 process.title = 'csvparserprice'
