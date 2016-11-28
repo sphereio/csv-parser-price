@@ -31,7 +31,7 @@ Options:
   --logLevel        Logging level: error, warn, info or verbose.
                                                                [default: "info"]
 ```
-When running with `--outputFile` set, logging information is shown directly otherwise it goes to `csvparserprice.log`.
+When running with `--outputFile` set, logging information is shown directly otherwise it goes to `csvparserprice.log` with the exception of fatal errors.
 
 ### JS
 ```js
@@ -64,6 +64,7 @@ csvParserPrice.parse(
   fs.createWriteStream('./output.json')
 );
 ```
+Errors on the level `error` come from events that are fatal and thus stop the stream of data.
 
 ## Configuration
 `CsvParserPrice` accepts three objects as arguments:
