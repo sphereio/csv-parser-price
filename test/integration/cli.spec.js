@@ -97,3 +97,18 @@ test('CLI exits on parsing errors', (t) => {
     }
   )
 })
+
+test('CLI logs stack trace on verbose level', (t) => {
+  const csvFilePath = './test/helpers/sample.csv'
+
+  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} --logLevel verbose`,
+    (error, stdout, stderr) => {
+      t.equal(error.code, 1, 'returns process error exit code')
+      t.false(stdout, 'returns no stdout data')
+      t.true(
+        stderr.match(/process._tickCallback/),
+        'returns stack trace error on stderr')
+      t.end()
+    }
+  )
+})
