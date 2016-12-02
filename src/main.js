@@ -6,13 +6,16 @@ import { unflatten } from 'flat'
 import _ from 'underscore'
 
 import CONSTANTS from './constants'
-import userAgent from './user-agent'
+import { userAgent } from 'sphere-node-utils'
 import mapCustomFields from './map-custom-fields'
+import pkg from '../package.json'
 
 export default class CsvParserPrice {
   constructor (apiClientConfig, logger, config = {}) {
     this.client = new SphereClient(
-      Object.assign(apiClientConfig, { user_agent: userAgent })
+      Object.assign(
+        apiClientConfig, { user_agent: userAgent(pkg.name, pkg.version) }
+      )
     )
 
     this.logger = logger || {
