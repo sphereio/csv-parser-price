@@ -2,11 +2,11 @@ import csv from 'csv-parser'
 import highland from 'highland'
 import JSONStream from 'JSONStream'
 import { SphereClient } from 'sphere-node-sdk'
+import { userAgent } from 'sphere-node-utils'
 import { unflatten } from 'flat'
 import _ from 'underscore'
 
 import CONSTANTS from './constants'
-import { userAgent } from 'sphere-node-utils'
 import mapCustomFields from './map-custom-fields'
 import pkg from '../package.json'
 
