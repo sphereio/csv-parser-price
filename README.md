@@ -6,7 +6,7 @@
 [![David Dependencies Status][david-icon]][david]
 [![David devDependencies Status][david-dev-icon]][david-dev]
 
-Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON.
+Convert [commercetools price](https://dev.commercetools.com/http-api-projects-products.html#price) CSV data to JSON. See [this CSV with example data](test/helpers/sample.csv) for the expected headers and data.
 
 ## Usage
 `npm install @commercetools/csv-parser-price --global`
