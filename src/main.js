@@ -162,7 +162,7 @@ export default class CsvParserPrice {
 
   // eslint-disable-next-line class-methods-use-this
   cleanOldData (data) {
-    this.logger.warn('Cleaning leftover data')
+    this.logger.verbose('Cleaning leftover data')
 
     const priceObj = data.prices[0]
     if (priceObj.customType)
