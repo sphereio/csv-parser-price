@@ -32,7 +32,7 @@ Convert commercetools price CSV data to JSON.`
   .option('inputFile', {
     alias: 'i',
     default: 'stdin',
-    describe: 'Path to CSV file.',
+    describe: 'Path to input CSV file.',
   })
   .coerce('inputFile', (arg) => {
     if (arg !== 'stdin')
@@ -44,7 +44,7 @@ Convert commercetools price CSV data to JSON.`
   .option('outputFile', {
     alias: 'o',
     default: 'stdout',
-    describe: 'Input CSV file.',
+    describe: 'Path to output JSON file.',
   })
   .coerce('outputFile', (arg) => {
     if (arg !== 'stdout')
