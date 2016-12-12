@@ -35,7 +35,7 @@ export default class CsvParserPrice {
   }
 
   parse (input, output) {
-    this.logger.verbose('Starting conversion')
+    this.logger.info('Starting conversion')
     let rowIndex = 1
 
     highland(input)

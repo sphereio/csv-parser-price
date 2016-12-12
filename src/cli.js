@@ -127,7 +127,7 @@ getApiCredentials(args.projectKey, args.accessToken)
       },
       {
         error: errorHandler,
-        warn: message => log.warn('', message),
+        // warn: message => log.warn('', message),
         info: message => log.info('', message),
         verbose: message => log.verbose('', message),
       },
