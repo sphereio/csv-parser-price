@@ -113,7 +113,11 @@ test(`mapCustomFields::parse
     '[row 1: my-category] - The number t isn\'t valid',
   ]
   t.deepEqual(result.data, expected)
-  t.deepEqual(result.error, expectedErrorArray, errMsg)
+  t.deepEqual(
+    result.error.map(error => error.message),
+    expectedErrorArray,
+    errMsg
+  )
   t.end()
 })
 

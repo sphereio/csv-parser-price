@@ -290,7 +290,10 @@ test(`CsvParserPrice::processCustomFields
     t.end()
   }, (error) => {
     t.equal(error.length, 1, 'Errors with data are reported')
-    t.equal(error[0], '[row 2: custom-type] - The number \'2\' isn\'t valid')
+    t.equal(
+      error[0].message,
+      '[row 2: custom-type] - The number \'2\' isn\'t valid'
+    )
     t.end()
   })
 })
