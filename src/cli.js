@@ -101,7 +101,7 @@ Convert commercetools price CSV data to JSON.`
   })
   .argv
 
-const errorHandler = (error) => {
+const logError = (error) => {
   const errorFormatter = new PrettyError()
   let formattedError
 
@@ -113,6 +113,14 @@ const errorHandler = (error) => {
   process.stderr.write(formattedError)
   process.stderr.write('\n')
   log.error('', formattedError)
+}
+
+const errorHandler = (errors) => {
+  if (Array.isArray(errors))
+    errors.forEach(logError)
+  else
+    logError(errors)
+
   process.exit(1)
 }
 

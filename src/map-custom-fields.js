@@ -17,8 +17,11 @@ export default (function MapCustomFields () {
   }
 
   function processError (errors, rowIndex, customTypeKey) {
+    if (!Array.isArray(errors))
+      return new Error(`[row ${rowIndex}: ${customTypeKey}] - ${errors}`)
+
     return _.reduce(errors, (prev, curr) => {
-      prev.push(`[row ${rowIndex}: ${customTypeKey}] - ${curr}`)
+      prev.push(new Error(`[row ${rowIndex}: ${customTypeKey}] - ${curr}`))
       return prev
     }, [])
   }
@@ -43,7 +46,7 @@ export default (function MapCustomFields () {
               const _result = this.mapNumber(value)
               if (_result.error)
                 result.error.push(
-                    `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
+                    processError(_result.error, rowIndex, customType.key)
                   )
               if (!_.isUndefined(_result.data))
                 custom.fields[key] = _result.data
@@ -53,7 +56,7 @@ export default (function MapCustomFields () {
               const _result = this.mapBoolean(value)
               if (_result.error)
                 result.error.push(
-                    `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
+                    processError(_result.error, rowIndex, customType.key)
                   )
               if (!_.isUndefined(_result.data))
                 custom.fields[key] = _result.data
@@ -63,7 +66,7 @@ export default (function MapCustomFields () {
               const _result = this.mapMoney(value)
               if (_result.error)
                 result.error.push(
-                    `[row ${rowIndex}: ${customType.key}] - ${_result.error}`
+                    processError(_result.error, rowIndex, customType.key)
                   )
               if (!_.isUndefined(_result.data))
                 custom.fields[key] = _result.data
@@ -96,7 +99,9 @@ export default (function MapCustomFields () {
                   fieldDef.type.name
                 }' type is not supported! Kindly raise an issue for this`
               result.error.push(
-                  `[row ${rowIndex}: ${customType.key}] - ${unsupportedMsg}`
+                  new Error(
+                    `[row ${rowIndex}: ${customType.key}] - ${unsupportedMsg}`
+                  )
                 )
             }
           }
