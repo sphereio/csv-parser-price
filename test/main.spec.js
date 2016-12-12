@@ -7,7 +7,8 @@ import StreamTest from 'streamtest'
 import test from 'tape'
 
 import CONSTANTS from '../src/constants'
-import { mockPriceObj, mockCustomTypeDef } from './helpers/mock-data'
+import priceSample from './helpers/price-sample'
+import customTypeSample from './helpers/custom-type-sample.json'
 
 const logger = {
   error: () => {},
@@ -126,12 +127,12 @@ test(`CsvParserPrice::parse
 test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  const _mockCustomTypeDef = mockCustomTypeDef()
+
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: _mockCustomTypeDef })
+    Promise.resolve({ body: customTypeSample })
   )
-  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
+
+  csvParserPrice.processData(priceSample(), 2).then((result) => {
     t.ok(result)
     t.ok(result.sku)
     t.equal(result.prices.length, 1, 'One price object is built')
@@ -144,17 +145,20 @@ test(`CsvParserPrice::processData
     t.notOk(price.customType, 'customType field is removed')
     t.notOk(price.customField, 'customField field is removed')
     t.notOk(price[CONSTANTS.header.sku], 'variant-sku field is removed')
-    t.deepEqual(price.custom, {
-      type: { id: '795962e6-c0cc-4b4d-84fc-7d8aaed390c0' },
-      fields: {
-        foo: 12,
-        bar: 'nac',
-        current: true,
-        name: { nl: 'Selwyn', de: 'Merkel' },
-        price: { currencyCode: 'EUR', centAmount: 1200 },
-        priceset: [ 1, 2, 3, 5 ],
+    t.deepEqual(
+      price.custom,
+      {
+        type: { id: '53 45 4c 57 59 4e 2e' },
+        fields: {
+          booleantype: true,
+          localizedstringtype: { de: 'Merkel', nl: 'Selwyn' },
+          moneytype: { centAmount: 1200, currencyCode: 'EUR' },
+          numbertype: 12,
+          settype: [ 1, 2, 3, 5 ],
+          stringtype: 'nac',
+        },
       },
-    }, 'Price custom fields object is built')
+      'Price custom fields object is built')
     t.end()
   })
 })
@@ -162,14 +166,15 @@ test(`CsvParserPrice::processData
 test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  delete _mockPriceObj.customType
-  delete _mockPriceObj.customField
-  const _mockCustomTypeDef = mockCustomTypeDef()
+  const modifiedPriceSample = priceSample()
+  delete modifiedPriceSample.customType
+  delete modifiedPriceSample.customField
+
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: _mockCustomTypeDef })
+    Promise.resolve({ body: customTypeSample })
   )
-  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
+
+  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
     t.ok(result)
     t.ok(result.sku)
     t.equal(result.prices.length, 1, 'One price object is built')
@@ -188,15 +193,16 @@ test(`CsvParserPrice::processData
   should process object and build valid price object
   if centAmount is not present`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  delete _mockPriceObj.customType
-  delete _mockPriceObj.customField
-  delete _mockPriceObj.value
-  const _mockCustomTypeDef = mockCustomTypeDef()
+  const modifiedPriceSample = priceSample()
+  delete modifiedPriceSample.customType
+  delete modifiedPriceSample.customField
+  delete modifiedPriceSample.value
+
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: _mockCustomTypeDef })
+    Promise.resolve({ body: customTypeSample })
   )
-  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
+
+  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
     t.ok(result)
     t.ok(result.sku)
     t.equal(result.prices.length, 1, 'One price object is built')
@@ -212,12 +218,12 @@ test(`CsvParserPrice::processData
   should rename customerGroup.groupName to customerGroup.id
   for compatibility with product price import module`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  delete _mockPriceObj.customType
-  delete _mockPriceObj.customField
-  delete _mockPriceObj.value
+  const modifiedPriceSample = priceSample()
+  delete modifiedPriceSample.customType
+  delete modifiedPriceSample.customField
+  delete modifiedPriceSample.value
 
-  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
     t.false(result.prices[0].customerGroup.groupName, 'Group name is deleted')
     t.equal(
       result.prices[0].customerGroup.id, 'customer-group',
@@ -231,12 +237,12 @@ test(`CsvParserPrice::processData
   should rename channel.key to channel.id
   for compatibility with product price import module`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  delete _mockPriceObj.customType
-  delete _mockPriceObj.customField
-  delete _mockPriceObj.value
+  const modifiedPriceSample = priceSample()
+  delete modifiedPriceSample.customType
+  delete modifiedPriceSample.customField
+  delete modifiedPriceSample.value
 
-  csvParserPrice.processData(_mockPriceObj, 2).then((result) => {
+  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
     t.false(result.prices[0].channel.key, 'Channel key is deleted')
     t.equal(
       result.prices[0].channel.id, 'my-channel',
@@ -249,25 +255,25 @@ test(`CsvParserPrice::processData
 test(`CsvParserPrice::processCustomFields
   should build custom object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  const _mockCustomTypeDef = mockCustomTypeDef()
+
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: _mockCustomTypeDef })
+    Promise.resolve({ body: customTypeSample })
   )
-  csvParserPrice.processCustomFields(_mockPriceObj, 2).then((result) => {
+
+  csvParserPrice.processCustomFields(priceSample(), 2).then((result) => {
     t.ok(result.fields, 'Custom fields object is present')
     t.ok(result.type, 'CustomObject is present')
     const expected = {
       type: {
-        id: '795962e6-c0cc-4b4d-84fc-7d8aaed390c0',
+        id: '53 45 4c 57 59 4e 2e',
       },
       fields: {
-        foo: 12,
-        bar: 'nac',
-        current: true,
-        name: { nl: 'Selwyn', de: 'Merkel' },
-        price: { currencyCode: 'EUR', centAmount: 1200 },
-        priceset: [ 1, 2, 3, 5 ],
+        booleantype: true,
+        localizedstringtype: { de: 'Merkel', nl: 'Selwyn' },
+        moneytype: { centAmount: 1200, currencyCode: 'EUR' },
+        numbertype: 12,
+        settype: [ 1, 2, 3, 5 ],
+        stringtype: 'nac',
       },
     }
     t.deepEqual(result, expected)
@@ -278,13 +284,14 @@ test(`CsvParserPrice::processCustomFields
 test(`CsvParserPrice::processCustomFields
   should build report errors on data`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  const _mockCustomTypeDef = mockCustomTypeDef()
-  _mockPriceObj.customField.priceset = '1,\'2\',3,4'
+  const modifiedPriceSample = priceSample()
+
+  modifiedPriceSample.customField.settype = '1,\'2\',3,4'
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: _mockCustomTypeDef })
+    Promise.resolve({ body: customTypeSample })
   )
-  csvParserPrice.processCustomFields(_mockPriceObj, 2).then((result) => {
+
+  csvParserPrice.processCustomFields(modifiedPriceSample, 2).then((result) => {
     t.fail()
     t.notOk(result)
     t.end()
@@ -292,7 +299,7 @@ test(`CsvParserPrice::processCustomFields
     t.equal(error.length, 1, 'Errors with data are reported')
     t.equal(
       error[0].message,
-      '[row 2: custom-type] - The number \'2\' isn\'t valid'
+      '[row 2: liqui 63 69 ty] - The number \'2\' isn\'t valid'
     )
     t.end()
   })
@@ -301,11 +308,11 @@ test(`CsvParserPrice::processCustomFields
 test(`CsvParserPrice::cleanOldData
   should delete old data if present`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const _mockPriceObj = mockPriceObj()
-  delete _mockPriceObj[CONSTANTS.header.sku]
+  const modifiedPriceSample = priceSample()
+  delete modifiedPriceSample[CONSTANTS.header.sku]
   const refinedPrice = {
-    sku: _mockPriceObj[CONSTANTS.header.sku],
-    prices: [_mockPriceObj],
+    sku: modifiedPriceSample[CONSTANTS.header.sku],
+    prices: [modifiedPriceSample],
   }
   t.ok(refinedPrice.prices[0].customField, 'customField field is not cleaned')
   t.ok(refinedPrice.prices[0].customType, 'customType field is not cleaned')
