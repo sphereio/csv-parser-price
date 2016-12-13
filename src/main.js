@@ -1,6 +1,7 @@
 import csv from 'csv-parser'
 import highland from 'highland'
 import JSONStream from 'JSONStream'
+import npmlog from 'npmlog'
 import { SphereClient } from 'sphere-node-sdk'
 import { userAgent } from 'sphere-node-utils'
 import { unflatten } from 'flat'
@@ -19,10 +20,10 @@ export default class CsvParserPrice {
     )
 
     this.logger = logger || {
-      error: process.stderr,
-      warn: process.stderr,
-      info: process.stdout,
-      verbose: process.stdout,
+      error: npmlog.error.bind(this, ''),
+      warn: npmlog.warn.bind(this, ''),
+      info: npmlog.info.bind(this, ''),
+      verbose: npmlog.verbose.bind(this, ''),
     }
 
     this.config = config

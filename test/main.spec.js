@@ -64,15 +64,13 @@ test(`CsvParserPrice
 
   // logger
   t.deepEqual(
-    csvParserPrice.logger,
-    {
-      error: process.stderr,
-      warn: process.stderr,
-      info: process.stdout,
-      verbose: process.stdout,
-    },
-    'logger should be set to the standard value'
+    Object.keys(csvParserPrice.logger),
+    ['error', 'warn', 'info', 'verbose'],
+    'logger should have expected keys'
   )
+  Object.keys(csvParserPrice.logger).forEach((key) => {
+    t.equal(typeof csvParserPrice.logger[key], 'function')
+  })
 
   // config
   t.equal(
@@ -93,7 +91,7 @@ test(`CsvParserPrice
 
 test(`CsvParserPrice::parse
   should accept a stream and output a stream`, (t) => {
-  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+  const csvParserPrice = new CsvParserPrice(apiClientConfig)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
