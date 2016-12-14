@@ -1,5 +1,5 @@
 import fs from 'fs'
-import log from 'npmlog'
+import npmlog from 'npmlog'
 import PrettyError from 'pretty-error'
 import yargs from 'yargs'
 
@@ -51,7 +51,7 @@ Convert commercetools price CSV data to JSON.`
       return fs.createWriteStream(String(arg))
 
     // No output file given, log to file to not disturb stdout/stderr
-    log.stream = fs.createWriteStream('csvparserprice.log')
+    npmlog.stream = fs.createWriteStream('csvparserprice.log')
 
     return process.stdout
   })
@@ -97,7 +97,7 @@ Convert commercetools price CSV data to JSON.`
     describe: 'Logging level: error, warn, info or verbose.',
   })
   .coerce('logLevel', (arg) => {
-    log.level = arg
+    npmlog.level = arg
   })
   .argv
 
@@ -105,14 +105,14 @@ const logError = (error) => {
   const errorFormatter = new PrettyError()
   let formattedError
 
-  if (log.level === 'verbose')
+  if (npmlog.level === 'verbose')
     formattedError = errorFormatter.render(error)
   else
     formattedError = error.message
 
   process.stderr.write(formattedError)
   process.stderr.write('\n')
-  log.error('', formattedError)
+  npmlog.error('', formattedError)
 }
 
 const errorHandler = (errors) => {
@@ -135,9 +135,9 @@ getApiCredentials(args.projectKey, args.accessToken)
       },
       {
         error: errorHandler,
-        // warn: message => log.warn('', message),
-        info: message => log.info('', message),
-        verbose: message => log.verbose('', message),
+        warn: npmlog.warn.bind(this, ''),
+        info: npmlog.info.bind(this, ''),
+        verbose: npmlog.verbose.bind(this, ''),
       },
       {
         delimiter: args.delimiter,
