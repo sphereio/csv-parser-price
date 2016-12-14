@@ -198,11 +198,20 @@ test(`mapCustomFields::mapNumber
 })
 
 test(`mapCustomFields::mapNumber
-  should return boolean value when passed in`, (t) => {
+  should return a valid number when passed in`, (t) => {
   const result = mapCustomFields.mapNumber('1400')
 
   t.notOk(result.error, 'There is no error')
   t.equal(result.data, 1400, 'Number of type `number`')
+  t.end()
+})
+
+test(`mapCustomFields::mapNumber
+  should parse a valid floating number`, (t) => {
+  const result = mapCustomFields.mapNumber('0.5')
+
+  t.notOk(result.error, 'There is no error')
+  t.equal(result.data, 0.5, 'Floating numbers is parsed successfully')
   t.end()
 })
 
@@ -223,7 +232,6 @@ test(`mapCustomFields::mapNumber
   t.notOk(result.data, 'No data is returned')
   t.end()
 })
-
 
 test(`mapCustomFields::mapSet
   should exists`, (t) => {
