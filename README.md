@@ -36,7 +36,7 @@ When running with `--outputFile` set, logging information is shown directly othe
 ### JS
 ```js
 const fs = require('fs');
-const CsvParserPrice = require('csv-parser-price');
+const CsvParserPrice = require('@commercetools/csv-parser-price');
 
 const apiCredentials = {
     project_key: process.env.CM_PROJECT_KEY,
