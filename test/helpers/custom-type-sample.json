@@ -1,6 +1,6 @@
 {
-  "key": "my-category",
-  "id": "123456789",
+  "id": "53 45 4c 57 59 4e 2e",
+  "key": "liqui 63 69 ty",
   "fieldDefinitions": [
     {
       "name": "stringtype",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "name": "money",
+      "name": "moneytype",
       "type": {
         "name": "Money"
       }

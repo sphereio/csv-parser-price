@@ -1,7 +1,7 @@
 import mapCustomFields from 'map-custom-fields'
 import test from 'tape'
 
-import customType from './helpers/custom-type-definition.mock.json'
+import customTypeSample from './helpers/custom-type-sample.json'
 
 test('mapCustomFields should exist', (t) => {
   t.ok(mapCustomFields)
@@ -37,11 +37,11 @@ test(`mapCustomFields::parse
       de: 'Merkel',
     },
     enumtype: 'Ready',
-    money: 'EUR 1200',
+    moneytype: 'EUR 1200',
     settype: '1,2,3,5',
   }
 
-  const result = mapCustomFields.parse(data, customType, 1)
+  const result = mapCustomFields.parse(data, customTypeSample, 1)
 
   t.equal(result.error.length, 0, 'There is no error')
   const expected = {
@@ -52,7 +52,7 @@ test(`mapCustomFields::parse
         de: 'Merkel',
         nl: 'Selwyn',
       },
-      money: {
+      moneytype: {
         centAmount: 1200,
         currencyCode: 'EUR',
       },
@@ -61,7 +61,7 @@ test(`mapCustomFields::parse
       stringtype: 'nac',
     },
     type: {
-      id: '123456789',
+      id: '53 45 4c 57 59 4e 2e',
     },
   }
   const testMsg = 'Data is parsed successfully'
@@ -81,11 +81,11 @@ test(`mapCustomFields::parse
       de: 'Merkel',
     },
     enumtype: 'Ready',
-    money: 'ABI',
+    moneytype: 'ABI',
     settype: 'qw,\'2\',v,t',
   }
 
-  const result = mapCustomFields.parse(data, customType, 1)
+  const result = mapCustomFields.parse(data, customTypeSample, 1)
 
   t.equal(result.error.length, 8, 'There are errors with data')
   const expected = {
@@ -97,20 +97,20 @@ test(`mapCustomFields::parse
       },
     },
     type: {
-      id: '123456789',
+      id: '53 45 4c 57 59 4e 2e',
     },
   }
   const errMsg = 'All errors are returned'
   const expectedErrorArray = [
-    '[row 1: my-category] - The number invalid isn\'t valid',
+    '[row 1: liqui 63 69 ty] - The number invalid isn\'t valid',
     // eslint-disable-next-line max-len
-    '[row 1: my-category] - \'unsupported\' type is not supported! Kindly raise an issue for this',
-    '[row 1: my-category] - The value \'abi§\' is not a valid boolean value',
-    '[row 1: my-category] - Invalid money - Cannot parse money ABI',
-    '[row 1: my-category] - The number qw isn\'t valid',
-    '[row 1: my-category] - The number \'2\' isn\'t valid',
-    '[row 1: my-category] - The number v isn\'t valid',
-    '[row 1: my-category] - The number t isn\'t valid',
+    '[row 1: liqui 63 69 ty] - \'unsupported\' type is not supported! Kindly raise an issue for this',
+    '[row 1: liqui 63 69 ty] - The value \'abi§\' is not a valid boolean value',
+    '[row 1: liqui 63 69 ty] - Invalid money - Cannot parse money ABI',
+    '[row 1: liqui 63 69 ty] - The number qw isn\'t valid',
+    '[row 1: liqui 63 69 ty] - The number \'2\' isn\'t valid',
+    '[row 1: liqui 63 69 ty] - The number v isn\'t valid',
+    '[row 1: liqui 63 69 ty] - The number t isn\'t valid',
   ]
   t.deepEqual(result.data, expected)
   t.deepEqual(
