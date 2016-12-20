@@ -197,16 +197,16 @@ export default (function MapCustomFields () {
     }, result)
   }
 
-  function mapNumber (rawNo, regEx = CONSTANTS.field.integer) {
+  function mapNumber (rawNo) {
     const result = {}
     if (!isValidValue(rawNo))
       return result
-    const matchedNumber = regEx.exec(rawNo)
-    if (!matchedNumber) {
+
+    if (isNaN(Number(rawNo))) {
       result.error = `The number ${rawNo} isn't valid`
       return result
     }
-    result.data = parseInt(matchedNumber[0], 10)
+    result.data = Number(rawNo)
     return result
   }
 }())
