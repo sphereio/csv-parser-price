@@ -201,12 +201,12 @@ export default (function MapCustomFields () {
     const result = {}
     if (!isValidValue(rawNo))
       return result
-    const isNotValidNumber = isNaN(Number(rawNo))
-    if (isNotValidNumber) {
+
+    if (isNaN(Number(rawNo))) {
       result.error = `The number ${rawNo} isn't valid`
       return result
     }
-    result.data = parseFloat(rawNo, 10)
+    result.data = Number(rawNo)
     return result
   }
 }())
