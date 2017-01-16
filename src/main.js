@@ -45,6 +45,8 @@ export default class CsvParserPrice {
         separator: this.delimiter,
         strict: this.strictMode,
       }))
+      // Sort by SKU so later when reducing prices we don't have to search
+      .sortBy((a, b) => a['variant-sku'].localeCompare(b['variant-sku']))
       // Limit amount of rows to be handled at the same time
       // Returns an array aka 'batch' of given rows
       .batch(this.batchSize)
@@ -60,7 +62,7 @@ export default class CsvParserPrice {
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
       .stopOnError(error => this.logger.error(error))
-      .reduce({ prices: [] }, (a, b) => {
+      .reduce({ prices: [] }, (data, currentPrice) => {
         /*
           This reduces all price objects to one object that is acceptable
           by the price-importer in product-import.
@@ -104,15 +106,15 @@ export default class CsvParserPrice {
             ]
           }
         */
-        if (a.prices.length) {
-          const _price = _.find(a.prices, price => price.sku === b.sku)
-          if (!_price)
-            a.prices.push(b)
-          else
-            _price.prices.push(...b.prices)
-        } else
-          a.prices.push(b)
-        return a
+
+        const previousPrice = data.prices[data.prices.length - 1]
+
+        if (previousPrice && previousPrice.sku === currentPrice.sku)
+          previousPrice.prices.push(...currentPrice.prices)
+        else
+          data.prices.push(currentPrice)
+
+        return data
       })
       .doto((data) => {
         const numberOfPrices = Number(JSON.stringify(data.prices.length)) + 1
