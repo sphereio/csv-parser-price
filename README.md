@@ -68,8 +68,7 @@ Errors on the level `error` come from events that are fatal and thus stop the st
 
 ## Configuration
 `CsvParserPrice` accepts three objects as arguments:
-- API client config (_required_)
-  - See the [SDK client documentation](http://sphereio.github.io/sphere-node-sdk/classes/SphereClient.html) for more information.
+- API client credentials for the [authentication middleware](https://commercetools.github.io/nodejs/docs/sdk/api/createAuthMiddlewareForClientCredentialsFlow.html) (_required_)
 - Logger takes object with four functions (_optional_)
 - Config (_optional_)
   - `batchSize`: number of CSV rows to handle simultaneously. (_default_: `100`)

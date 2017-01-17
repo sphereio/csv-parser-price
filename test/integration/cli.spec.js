@@ -1,6 +1,5 @@
 import { exec } from 'child_process'
 import fs from 'fs'
-import { SphereClient } from 'sphere-node-sdk'
 import test from 'tape'
 import tmp from 'tmp'
 
@@ -9,12 +8,14 @@ import getApiCredentials from '../../src/get-api-credentials'
 
 const binPath = './bin/csvparserprice.js'
 
+// TODO: replace with package call
 let PROJECT_KEY
 if (process.env.CI === 'true')
   PROJECT_KEY = process.env.SPHERE_PROJECT_KEY
 else
   PROJECT_KEY = process.env.npm_config_projectkey
 
+// TODO: replace with package call
 const getApiClient = projectKey => getApiCredentials(projectKey)
     .then(apiCredentials =>
       new SphereClient(

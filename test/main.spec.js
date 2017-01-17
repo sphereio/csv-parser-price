@@ -1,7 +1,6 @@
 import CsvParserPrice from 'main'
 import fs from 'fs'
 import path from 'path'
-import { SphereClient } from 'sphere-node-sdk'
 import sinon from 'sinon'
 import StreamTest from 'streamtest'
 import test from 'tape'
@@ -17,6 +16,7 @@ const logger = {
   verbose: () => {},
 }
 
+// TODO: replace from here to line 47
 let PROJECT_KEY
 
 if (process.env.CI === 'true')
@@ -52,6 +52,7 @@ test('CsvParserPrice module is a class', (t) => {
   t.end()
 })
 
+// TODO: replace the clientConfig part
 test(`CsvParserPrice
   should initialize default values`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig)

@@ -2,22 +2,27 @@ import csv from 'csv-parser'
 import highland from 'highland'
 import JSONStream from 'JSONStream'
 import npmlog from 'npmlog'
-import { SphereClient } from 'sphere-node-sdk'
-import { userAgent } from 'sphere-node-utils'
 import { unflatten } from 'flat'
 import _ from 'underscore'
+
+import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth'
+import { createClient } from '@commercetools/sdk-client'
+import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
+import { createRequestBuilder } from '@commercetools/api-request-builder'
+
 
 import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'
 import pkg from '../package.json'
 
 export default class CsvParserPrice {
-  constructor (apiClientConfig, logger, config = {}) {
-    this.client = new SphereClient(
-      Object.assign(
-        apiClientConfig, { user_agent: userAgent(pkg.name, pkg.version) }
-      )
-    )
+  constructor (apiClientCredentials, logger, config = {}) {
+    this.client = createClient({
+      middlewares: [
+        createAuthMiddlewareForClientCredentialsFlow(apiClientCredentials),
+        createHttpMiddleware(),
+      ],
+    })
 
     this.logger = logger || {
       error: npmlog.error.bind(this, ''),
@@ -197,6 +202,6 @@ export default class CsvParserPrice {
 // Easiest way to wrap the getCustomTypeDefinition in the memoize method
 CsvParserPrice.prototype.getCustomTypeDefinition = _.memoize(
   function _getCustomTypeDefinition (customTypeKey) {
-    return this.client.types.byKey(customTypeKey).fetch()
+    return createRequestBuilder().types.byKey(customTypeKey).fetch()
   }
 )

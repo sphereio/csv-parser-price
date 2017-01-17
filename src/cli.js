@@ -80,12 +80,9 @@ Convert commercetools price CSV data to JSON.`
     demand: true,
   })
 
+  // TODO: define this better
   .option('host', {
     describe: 'HTTP client host parameter.',
-  })
-
-  .option('protocol', {
-    describe: 'HTTP client protocol parameter.',
   })
 
   .option('accessToken', {
@@ -126,13 +123,9 @@ const errorHandler = (errors) => {
 
 getApiCredentials(args.projectKey, args.accessToken)
   .then(apiCredentials =>
+    // TODO: where is the accessToken gone?
     new CsvParserPrice(
-      {
-        config: apiCredentials,
-        host: args.host,
-        protocol: args.protocol,
-        access_token: args.accessToken,
-      },
+      apiCredentials,
       {
         error: errorHandler,
         warn: npmlog.warn.bind(this, ''),

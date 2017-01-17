@@ -36,7 +36,7 @@
     "test:watch": "chokidar src test bin -c 'npm test'",
     "build": "npm run clean && babel src bin -d lib",
     "clean": "rimraf lib/*",
-    "commit": "git-cz",
+    "commit": "git-cz || true",
     "codecov": "cat ./coverage/lcov.info | codecov",
     "coverage": "npm run lint && npm run build && cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text npm test",
     "coverage:html": "npm run lint && cross-env NODE_ENV=test nyc --reporter=html npm test",
@@ -51,6 +51,10 @@
     "node": ">= 4.5.0"
   },
   "dependencies": {
+    "@commercetools/api-request-builder": "^1.2.0",
+    "@commercetools/sdk-client": "^1.2.0",
+    "@commercetools/sdk-middleware-auth": "^1.1.0",
+    "@commercetools/sdk-middleware-http": "^1.1.0",
     "JSONStream": "^1.2.1",
     "bluebird": "^3.4.6",
     "csv-parser": "^1.11.0",
@@ -58,8 +62,6 @@
     "highland": "^2.10.1",
     "npmlog": "^4.0.1",
     "pretty-error": "^2.0.2",
-    "sphere-node-sdk": "^1.16.0",
-    "sphere-node-utils": "^0.9.1",
     "underscore": "^1.8.3",
     "underscore-mixins": "^0.1.4",
     "yargs": "^6.4.0"
