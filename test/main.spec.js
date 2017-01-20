@@ -16,53 +16,18 @@ const logger = {
   verbose: () => {},
 }
 
-// TODO: replace from here to line 47
-let PROJECT_KEY
-
-if (process.env.CI === 'true')
-  PROJECT_KEY = process.env.SPHERE_PROJECT_KEY
-else
-  PROJECT_KEY = process.env.npm_config_projectkey
-
+// TODO: replace with package call (sdk-middleware-auth-password)
 const apiClientConfig = {
-  config: {
-    project_key: PROJECT_KEY,
-    client_id: '*********',
-    client_secret: '*********',
-  },
-  rest: {
-    config: {},
-    GET: (endpoint, callback) => {
-      callback(null, { statusCode: 200 }, { results: [] })
-    },
-    POST: (endpoint, payload, callback) => {
-      callback(null, { statusCode: 200 })
-    },
-    PUT: () => {},
-    DELETE: () => (/* endpoint, callback */) => {},
-    PAGED: () => (/* endpoint, callback */) => {},
-    _preRequest: () => {},
-    _doRequest: () => {},
-  },
+  projectKey: process.env.CT_PROJECT_KEY,
+  credentials: {
+    clientId: process.env.CT_CLIENT_ID,
+    clientSecret: process.env.CT_CLIENT_SECRET,
+  }
 }
 
-test('CsvParserPrice module is a class', (t) => {
-  t.equal(typeof CsvParserPrice, 'function', 'CsvParserPrice is a class')
-
-  t.end()
-})
-
-// TODO: replace the clientConfig part
 test(`CsvParserPrice
   should initialize default values`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig)
-
-  // apiClientConfig
-  t.equal(
-    csvParserPrice.client.constructor,
-    SphereClient,
-    'csvParserPrice module is an instanceof SphereClient'
-  )
 
   // logger
   t.deepEqual(
@@ -81,13 +46,6 @@ test(`CsvParserPrice
     'parser option should be set to the standard value'
   )
 
-  t.end()
-})
-
-test(`CsvParserPrice
-  should throw when options is invalid`, (t) => {
-  // eslint-disable-next-line no-new
-  t.throws(() => { new CsvParserPrice(logger, {}) })
   t.end()
 })
 

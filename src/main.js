@@ -10,7 +10,6 @@ import { createClient } from '@commercetools/sdk-client'
 import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
 import { createRequestBuilder } from '@commercetools/api-request-builder'
 
-
 import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'
 import pkg from '../package.json'
@@ -41,6 +40,7 @@ export default class CsvParserPrice {
   }
 
   parse (input, output) {
+    debugger;
     this.logger.info('Starting conversion')
     let rowIndex = 1
 
@@ -202,6 +202,14 @@ export default class CsvParserPrice {
 // Easiest way to wrap the getCustomTypeDefinition in the memoize method
 CsvParserPrice.prototype.getCustomTypeDefinition = _.memoize(
   function _getCustomTypeDefinition (customTypeKey) {
-    return createRequestBuilder().types.byKey(customTypeKey).fetch()
+    const getTypeByKeyUri = createRequestBuilder().types
+      // TODO: replace with .byKey
+      .where(`key = "${customTypeKey}"`)
+      .build({ projectKey: process.env.CT_PROJECT_KEY })
+
+    return this.client.execute({
+      uri: getTypeByKeyUri,
+      method: 'GET',
+    })
   }
 )

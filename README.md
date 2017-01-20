@@ -38,15 +38,13 @@ When running with `--outputFile` set, logging information is shown directly othe
 const fs = require('fs');
 const CsvParserPrice = require('@commercetools/csv-parser-price');
 
-const apiCredentials = {
-    project_key: process.env.CM_PROJECT_KEY,
-    client_id: '*********',
-    client_secret: '*********'
-};
-
 const csvParserPrice = new CsvParserPrice(
   {
-    config: apiCredentials
+      projectKey: process.env.CT_PROJECT_KEY,
+      credentials: {
+        clientId: process.env.CT_CLIENT_ID,
+        clientSecret: process.env.CT_CLIENT_SECRET,
+      },
   },
   {
     error: console.error,

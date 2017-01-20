@@ -2,28 +2,31 @@ import { exec } from 'child_process'
 import fs from 'fs'
 import test from 'tape'
 import tmp from 'tmp'
-
 import { version } from '../../package.json'
-import getApiCredentials from '../../src/get-api-credentials'
+
+import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth'
+import { createClient } from '@commercetools/sdk-client'
+import { createRequestBuilder } from '@commercetools/api-request-builder'
+import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
 
 const binPath = './bin/csvparserprice.js'
 
 // TODO: replace with package call
-let PROJECT_KEY
-if (process.env.CI === 'true')
-  PROJECT_KEY = process.env.SPHERE_PROJECT_KEY
-else
-  PROJECT_KEY = process.env.npm_config_projectkey
+const apiClientCredentials = {
+  projectKey: process.env.CT_PROJECT_KEY,
+  credentials: {
+    clientId: process.env.CT_CLIENT_ID,
+    clientSecret: process.env.CT_CLIENT_SECRET,
+  }
+}
 
 // TODO: replace with package call
-const getApiClient = projectKey => getApiCredentials(projectKey)
-    .then(apiCredentials =>
-      new SphereClient(
-        {
-          config: apiCredentials,
-        },
-      )
-    )
+const getApiClient = createClient({
+  middlewares: [
+    createAuthMiddlewareForClientCredentialsFlow(apiClientCredentials),
+    createHttpMiddleware(),
+  ],
+})
 
 test('CLI help flag', (t) => {
   exec(`${binPath} --help`, (error, stdout, stderr) => {
@@ -44,7 +47,7 @@ test('CLI version flag', (t) => {
 test('CLI takes input from file', (t) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
 
-  exec(`${binPath} -p ${PROJECT_KEY} --inputFile ${csvFilePath}`,
+  exec(`${binPath} -p ${apiClientCredentials.projectKey} --inputFile ${csvFilePath}`,
     (error, stdout, stderr) => {
       t.true(stdout.match(/prices/), 'outputs data including \'prices\'')
       t.false(error && stderr, 'returns no error')
@@ -57,7 +60,7 @@ test('CLI writes output to file', (t) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
-  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
+  exec(`${binPath} -p ${apiClientCredentials.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (cliError, stdout, stderr) => {
       t.false(cliError && stderr, 'returns no CLI error')
 
@@ -81,7 +84,7 @@ test('CLI exits on faulty CSV format', (t) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
-  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
+  exec(`${binPath} -p ${apiClientCredentials.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
@@ -94,11 +97,11 @@ test('CLI exits on faulty CSV format', (t) => {
   )
 })
 
-test('CLI exits on parsing errors', (t) => {
+test.only('CLI exits on parsing errors', (t) => {
   const csvFilePath = './test/helpers/missing-type-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
-  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
+  exec(`${binPath} -p ${apiClientCredentials.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
@@ -110,6 +113,7 @@ test('CLI exits on parsing errors', (t) => {
   )
 })
 
+// TODO: fix the getApiClient and deletion of type
 test('CLI exits on type mapping errors', (t) => {
   const csvFilePath = './test/helpers/sample.csv'
   const jsonFilePath = tmp.fileSync().name
@@ -128,16 +132,25 @@ test('CLI exits on type mapping errors', (t) => {
     ],
   }
 
-  getApiClient(PROJECT_KEY)
+  const getTypeByKeyUri = createRequestBuilder().types
+    // TODO: replace with .byKey
+    .where('key = "custom-type"')
+    .build({ projectKey: process.env.CT_PROJECT_KEY })
+
+  getApiClient(apiClientCredentials.projectKey)
     // Clean up and create new custom type
     .then(client =>
+      // this.client.execute({
+      //   uri: getTypeByKeyUri,
+      //   method: 'GET',
+      // })
       client.types.byKey('custom-type').delete(1)
         // Ignore rejection, we want to create the type either way
         .catch(() => true)
         .then(() => client.types.create(customTypePayload))
     )
     .then(() => {
-      exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} -o ${jsonFilePath}`,
+      exec(`${binPath} -p ${apiClientCredentials.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
         (error, stdout, stderr) => {
           t.equal(error.code, 1, 'returns process error exit code')
           t.false(stdout, 'returns no stdout data')
@@ -153,7 +166,7 @@ test('CLI exits on type mapping errors', (t) => {
 test('CLI logs stack trace on verbose level', (t) => {
   const csvFilePath = './test/helpers/missing-type-sample.csv'
 
-  exec(`${binPath} -p ${PROJECT_KEY} -i ${csvFilePath} --logLevel verbose`,
+  exec(`${binPath} -p ${apiClientCredentials.projectKey} -i ${csvFilePath} --logLevel verbose`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')

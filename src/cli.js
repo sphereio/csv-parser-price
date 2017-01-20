@@ -5,7 +5,6 @@ import yargs from 'yargs'
 
 import CONSTANTS from './constants'
 import CsvParserPrice from './main'
-import getApiCredentials from './get-api-credentials'
 import { version } from '../package.json'
 
 process.title = 'csvparserprice'
@@ -121,22 +120,24 @@ const errorHandler = (errors) => {
   process.exit(1)
 }
 
-getApiCredentials(args.projectKey, args.accessToken)
-  .then(apiCredentials =>
-    // TODO: where is the accessToken gone?
-    new CsvParserPrice(
-      apiCredentials,
-      {
-        error: errorHandler,
-        warn: npmlog.warn.bind(this, ''),
-        info: npmlog.info.bind(this, ''),
-        verbose: npmlog.verbose.bind(this, ''),
-      },
-      {
-        delimiter: args.delimiter,
+// TODO: where is the accessToken gone?
+const csvParserPrice = new CsvParserPrice(
+  {
+      projectKey: process.env.CT_PROJECT_KEY,
+      credentials: {
+        clientId: process.env.CT_CLIENT_ID,
+        clientSecret: process.env.CT_CLIENT_SECRET,
       }
-    )
-  )
-  .then((csvParserPrice) => {
-    csvParserPrice.parse(args.inputFile, args.outputFile)
-  })
+  },
+  {
+    error: errorHandler,
+    warn: npmlog.warn.bind(this, ''),
+    info: npmlog.info.bind(this, ''),
+    verbose: npmlog.verbose.bind(this, ''),
+  },
+  {
+    delimiter: args.delimiter,
+  }
+)
+
+csvParserPrice.parse(args.inputFile, args.outputFile)

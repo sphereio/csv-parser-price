@@ -1,6 +1,0 @@
-- use the new SDK packages
-  - get it working by manually passing the creds
-  - retrieve creds from the FS
-- get rid of underscore dependencies
-- move to new repo
-  - remove all root files that already exist in the monorepo
