@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "npm run test:watch",
-    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js test/**/*.spec.js | tap-spec",
+    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js | tap-spec",
     "test:watch": "chokidar src test bin -c 'npm test'",
     "build": "npm run clean && babel src bin -d lib",
     "clean": "rimraf lib/*",

@@ -55,9 +55,14 @@ test(`CsvParserPrice::parse
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
-  const outputStream = StreamTest['v2'].toText((err, result) => {
+
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+    Promise.resolve(customTypeSample)
+  )
+
+  const outputStream = StreamTest['v2'].toText((error, result) => {
     const prices = JSON.parse(result).prices
-    t.equal(prices.length, 2, 'All prices from the csv is parsed')
+    t.equal(prices.length, 2, 'All prices from the csv are parsed')
     t.ok(prices[0].sku, 'Sku exists on price object')
     t.end()
   })
@@ -70,7 +75,12 @@ test(`CsvParserPrice::parse
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
   )
-  const outputStream = StreamTest['v2'].toText((err, result) => {
+
+  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+    Promise.resolve(customTypeSample)
+  )
+
+  const outputStream = StreamTest['v2'].toText((error, result) => {
     const prices = JSON.parse(result).prices
     t.equal(prices.length, 2, 'All prices from the csv is parsed')
     t.equal(prices[0].prices.length, 2, 'price with similar skus are grouped')
@@ -86,7 +96,7 @@ test(`CsvParserPrice::processData
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: customTypeSample })
+    Promise.resolve(customTypeSample)
   )
 
   csvParserPrice.processData(priceSample(), 2).then((result) => {
@@ -128,7 +138,7 @@ test(`CsvParserPrice::processData
   delete modifiedPriceSample.customField
 
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: customTypeSample })
+    Promise.resolve(customTypeSample)
   )
 
   csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
@@ -156,7 +166,7 @@ test(`CsvParserPrice::processData
   delete modifiedPriceSample.value
 
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: customTypeSample })
+    Promise.resolve(customTypeSample)
   )
 
   csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
@@ -214,7 +224,7 @@ test(`CsvParserPrice::processCustomFields
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: customTypeSample })
+    Promise.resolve(customTypeSample)
   )
 
   csvParserPrice.processCustomFields(priceSample(), 2).then((result) => {
@@ -245,7 +255,7 @@ test(`CsvParserPrice::processCustomFields
 
   modifiedPriceSample.customField.settype = '1,\'2\',3,4'
   sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-    Promise.resolve({ body: customTypeSample })
+    Promise.resolve(customTypeSample)
   )
 
   csvParserPrice.processCustomFields(modifiedPriceSample, 2).then((result) => {

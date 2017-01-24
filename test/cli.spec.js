@@ -2,7 +2,7 @@ import { exec } from 'child_process'
 import fs from 'fs'
 import test from 'tape'
 import tmp from 'tmp'
-import { version } from '../../package.json'
+import { version } from '../package.json'
 
 import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth'
 import { createClient } from '@commercetools/sdk-client'
@@ -20,11 +20,10 @@ const apiClientCredentials = {
   }
 }
 
-// TODO: replace with package call
-const getApiClient = createClient({
+const client = createClient({
   middlewares: [
     createAuthMiddlewareForClientCredentialsFlow(apiClientCredentials),
-    createHttpMiddleware(),
+    createHttpMiddleware({}),
   ],
 })
 
@@ -97,7 +96,7 @@ test('CLI exits on faulty CSV format', (t) => {
   )
 })
 
-test.only('CLI exits on parsing errors', (t) => {
+test('CLI exits on parsing errors', (t) => {
   const csvFilePath = './test/helpers/missing-type-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
@@ -106,14 +105,13 @@ test.only('CLI exits on parsing errors', (t) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
       t.true(
-        stderr.match(/types\/key=.+ not found/),
+        stderr.match(/No type with key .+ found/),
         'returns SDK error on stderr')
       t.end()
     }
   )
 })
 
-// TODO: fix the getApiClient and deletion of type
 test('CLI exits on type mapping errors', (t) => {
   const csvFilePath = './test/helpers/sample.csv'
   const jsonFilePath = tmp.fileSync().name
@@ -132,23 +130,21 @@ test('CLI exits on type mapping errors', (t) => {
     ],
   }
 
-  const getTypeByKeyUri = createRequestBuilder().types
-    // TODO: replace with .byKey
-    .where('key = "custom-type"')
-    .build({ projectKey: process.env.CT_PROJECT_KEY })
-
-  getApiClient(apiClientCredentials.projectKey)
-    // Clean up and create new custom type
-    .then(client =>
-      // this.client.execute({
-      //   uri: getTypeByKeyUri,
-      //   method: 'GET',
-      // })
-      client.types.byKey('custom-type').delete(1)
-        // Ignore rejection, we want to create the type either way
-        .catch(() => true)
-        .then(() => client.types.create(customTypePayload))
-    )
+  // Clean up and create new custom type
+  client.execute({
+    uri: `/${process.env.CT_PROJECT_KEY}/types/key=${customTypePayload.key}?version=1`,
+    method: 'DELETE',
+  })
+    // Ignore rejection, we want to create the type either way
+    .catch(() => true)
+    .then(() => client.execute({
+      // uri: `/${process.env.CT_PROJECT_KEY}/types/`,
+      uri: createRequestBuilder().types.build({
+        projectKey: process.env.CT_PROJECT_KEY,
+      }),
+      body: customTypePayload,
+      method: 'POST',
+    }))
     .then(() => {
       exec(`${binPath} -p ${apiClientCredentials.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
         (error, stdout, stderr) => {
@@ -159,7 +155,7 @@ test('CLI exits on type mapping errors', (t) => {
             'returns mapping error on stderr')
           t.end()
         }
-        )
+      )
     })
 })
 
