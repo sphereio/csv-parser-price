@@ -1,9 +1,9 @@
 import csv from 'csv-parser'
 import highland from 'highland'
 import JSONStream from 'JSONStream'
+import memoize from 'lodash.memoize'
 import npmlog from 'npmlog'
 import { unflatten } from 'flat'
-import _ from 'underscore'
 
 import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth'
 import { createClient } from '@commercetools/sdk-client'
@@ -129,26 +129,25 @@ export default class CsvParserPrice {
   }
 
   processData (data, rowIndex) {
-    const _data = _.clone(data)
     return new Promise((resolve, reject) => {
-      if (_data.value && _data.value.centAmount)
-        _data.value.centAmount = parseInt(_data.value.centAmount, 10)
+      if (data.value && data.value.centAmount)
+        data.value.centAmount = parseInt(data.value.centAmount, 10)
 
       // Rename groupName to ID for compatibility with price import module
-      if (_data.customerGroup && _data.customerGroup.groupName) {
-        _data.customerGroup.id = _data.customerGroup.groupName
-        delete _data.customerGroup.groupName
+      if (data.customerGroup && data.customerGroup.groupName) {
+        data.customerGroup.id = data.customerGroup.groupName
+        delete data.customerGroup.groupName
       }
 
       // Rename channel key to ID for compatibility with price import module
-      if (_data.channel && _data.channel.key) {
-        _data.channel.id = _data.channel.key
-        delete _data.channel.key
+      if (data.channel && data.channel.key) {
+        data.channel.id = data.channel.key
+        delete data.channel.key
       }
 
       const price = {
-        sku: _data[CONSTANTS.header.sku],
-        prices: [_data],
+        sku: data[CONSTANTS.header.sku],
+        prices: [data],
       }
 
       if (data.customType) {
@@ -156,8 +155,8 @@ export default class CsvParserPrice {
 
         return this.processCustomFields(data, rowIndex)
           .then((customTypeObj) => {
-            _data.custom = customTypeObj
-            price.prices = [_data]
+            data.custom = customTypeObj
+            price.prices = [data]
             resolve(this.cleanOldData(price))
           })
           .catch(reject)
@@ -198,7 +197,7 @@ export default class CsvParserPrice {
 }
 
 // Easiest way to wrap the getCustomTypeDefinition in the memoize method
-CsvParserPrice.prototype.getCustomTypeDefinition = _.memoize(
+CsvParserPrice.prototype.getCustomTypeDefinition = memoize(
   function _getCustomTypeDefinition (customTypeKey) {
     const getTypeByKeyUri = createRequestBuilder().types
       // TODO: replace with .byKey

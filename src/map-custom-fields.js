@@ -1,5 +1,3 @@
-import _ from 'underscore'
-
 import CONSTANTS from './constants'
 
 export default (function MapCustomFields () {
@@ -13,21 +11,20 @@ export default (function MapCustomFields () {
   }
 
   function isValidValue (value) {
-    return _.isString(value) && value.length > 0
+    return typeof value === 'string' && value.length > 0
   }
 
   function processError (errors, rowIndex, customTypeKey) {
     if (!Array.isArray(errors))
       return new Error(`[row ${rowIndex}: ${customTypeKey}] - ${errors}`)
 
-    return _.reduce(errors, (prev, curr) => {
+    return errors.reduce((prev, curr) => {
       prev.push(new Error(`[row ${rowIndex}: ${customTypeKey}] - ${curr}`))
       return prev
     }, [])
   }
 
   function parse (data, customType, rowIndex) {
-    const _data = _.clone(data)
     const custom = {
       type: {
         id: customType.id,
@@ -38,8 +35,11 @@ export default (function MapCustomFields () {
       error: [],
       data: custom,
     }
-    _.each(_data, (value, key) => {
-      _.each(customType.fieldDefinitions, (fieldDef) => {
+
+    Object.keys(data).forEach((key) => {
+      const value = data[key]
+
+      customType.fieldDefinitions.forEach((fieldDef) => {
         if (fieldDef.name === key)
           switch (fieldDef.type.name) {
             case 'Number': {
@@ -48,7 +48,7 @@ export default (function MapCustomFields () {
                 result.error.push(
                     processError(_result.error, rowIndex, customType.key)
                   )
-              if (!_.isUndefined(_result.data))
+              if (!(_result.data === undefined))
                 custom.fields[key] = _result.data
               break
             }
@@ -58,7 +58,7 @@ export default (function MapCustomFields () {
                 result.error.push(
                     processError(_result.error, rowIndex, customType.key)
                   )
-              if (!_.isUndefined(_result.data))
+              if (!(_result.data === undefined))
                 custom.fields[key] = _result.data
               break
             }
@@ -68,7 +68,7 @@ export default (function MapCustomFields () {
                 result.error.push(
                     processError(_result.error, rowIndex, customType.key)
                   )
-              if (!_.isUndefined(_result.data))
+              if (!(_result.data === undefined))
                 custom.fields[key] = _result.data
               break
             }
@@ -90,7 +90,7 @@ export default (function MapCustomFields () {
             case 'Time':
             case 'DateTime':
             case 'Reference': {
-              if (!_.isUndefined(value))
+              if (!(value === undefined))
                 custom.fields[key] = value
               break
             }
@@ -112,13 +112,13 @@ export default (function MapCustomFields () {
 
   function mapBoolean (value) {
     const result = {}
-    if (_.isUndefined(value) || (_.isString(value) && _.isEmpty(value)))
+    if (value === undefined || (typeof value === 'string' && value === ''))
       return result
     const _value = value.trim()
     const errorMsg = `The value '${_value}' is not a valid boolean value`
     try {
       const b = JSON.parse(_value.toLowerCase())
-      if (!_.isBoolean(b)) {
+      if (!(typeof b === 'boolean')) {
         result.error = errorMsg
         return result
       }
@@ -154,7 +154,7 @@ export default (function MapCustomFields () {
       data: [],
     }
     const values = value.split(',')
-    const _result = _.map(values, (item) => {
+    const _result = values.map((item) => {
       const _item = item.trim()
       switch (elementType.name) {
         case 'Number': {
@@ -188,10 +188,10 @@ export default (function MapCustomFields () {
       }
     })
 
-    return _.reduce(_result, (prev, curr) => {
+    return _result.reduce((prev, curr) => {
       if (curr.error)
         prev.error.push(curr.error)
-      if (!_.isUndefined(curr.data))
+      if (!(curr.data === undefined))
         prev.data.push(curr.data)
       return prev
     }, result)
