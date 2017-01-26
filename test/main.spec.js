@@ -22,7 +22,7 @@ const apiClientConfig = {
   credentials: {
     clientId: process.env.CT_CLIENT_ID,
     clientSecret: process.env.CT_CLIENT_SECRET,
-  }
+  },
 }
 
 test(`CsvParserPrice
@@ -56,7 +56,7 @@ test(`CsvParserPrice::parse
     path.join(__dirname, 'helpers/sample.csv')
   )
 
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
@@ -76,7 +76,7 @@ test(`CsvParserPrice::parse
     path.join(__dirname, 'helpers/sample.csv')
   )
 
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
@@ -95,7 +95,7 @@ test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
@@ -137,7 +137,7 @@ test(`CsvParserPrice::processData
   delete modifiedPriceSample.customType
   delete modifiedPriceSample.customField
 
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
@@ -165,7 +165,7 @@ test(`CsvParserPrice::processData
   delete modifiedPriceSample.customField
   delete modifiedPriceSample.value
 
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
@@ -181,7 +181,7 @@ test(`CsvParserPrice::processData
   })
 })
 
-test(`CsvParserPrice::processData
+test(`CsvParserPrice::renameHeaders
   should rename customerGroup.groupName to customerGroup.id
   for compatibility with product price import module`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
@@ -190,17 +190,17 @@ test(`CsvParserPrice::processData
   delete modifiedPriceSample.customField
   delete modifiedPriceSample.value
 
-  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
-    t.false(result.prices[0].customerGroup.groupName, 'Group name is deleted')
-    t.equal(
-      result.prices[0].customerGroup.id, 'customer-group',
-      'Customer group ID has group name value'
-    )
-    t.end()
-  })
+  const result = csvParserPrice.renameHeaders(modifiedPriceSample)
+
+  t.false(result.customerGroup.groupName, 'Group name is deleted')
+  t.equal(
+    result.customerGroup.id, 'customer-group',
+    'Customer group ID has group name value'
+  )
+  t.end()
 })
 
-test(`CsvParserPrice::processData
+test(`CsvParserPrice::renameHeaders
   should rename channel.key to channel.id
   for compatibility with product price import module`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
@@ -209,25 +209,25 @@ test(`CsvParserPrice::processData
   delete modifiedPriceSample.customField
   delete modifiedPriceSample.value
 
-  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
-    t.false(result.prices[0].channel.key, 'Channel key is deleted')
-    t.equal(
-      result.prices[0].channel.id, 'my-channel',
-      'Channel ID has channel key value'
-    )
-    t.end()
-  })
+  const result = csvParserPrice.renameHeaders(modifiedPriceSample)
+
+  t.false(result.channel.key, 'Channel key is deleted')
+  t.equal(
+    result.channel.id, 'my-channel',
+    'Channel ID has channel key value'
+  )
+  t.end()
 })
 
-test(`CsvParserPrice::processCustomFields
+test(`CsvParserPrice::processCustomField
   should build custom object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
-  csvParserPrice.processCustomFields(priceSample(), 2).then((result) => {
+  csvParserPrice.processCustomField(priceSample(), 2).then((result) => {
     t.ok(result.fields, 'Custom fields object is present')
     t.ok(result.type, 'CustomObject is present')
     const expected = {
@@ -248,17 +248,17 @@ test(`CsvParserPrice::processCustomFields
   })
 })
 
-test(`CsvParserPrice::processCustomFields
+test(`CsvParserPrice::processCustomField
   should build report errors on data`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const modifiedPriceSample = priceSample()
 
   modifiedPriceSample.customField.settype = '1,\'2\',3,4'
-  sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
+  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
     Promise.resolve(customTypeSample)
   )
 
-  csvParserPrice.processCustomFields(modifiedPriceSample, 2).then((result) => {
+  csvParserPrice.processCustomField(modifiedPriceSample, 2).then((result) => {
     t.fail()
     t.notOk(result)
     t.end()

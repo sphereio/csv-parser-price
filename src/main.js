@@ -5,21 +5,21 @@ import memoize from 'lodash.memoize'
 import npmlog from 'npmlog'
 import { unflatten } from 'flat'
 
-import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth'
+import { createAuthMiddlewareForClientCredentialsFlow }
+  from '@commercetools/sdk-middleware-auth'
 import { createClient } from '@commercetools/sdk-client'
 import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
 import { createRequestBuilder } from '@commercetools/api-request-builder'
 
 import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'
-import pkg from '../package.json'
 
 export default class CsvParserPrice {
   constructor (apiClientCredentials, logger, config = {}) {
     this.client = createClient({
       middlewares: [
         createAuthMiddlewareForClientCredentialsFlow(apiClientCredentials),
-        createHttpMiddleware({}),
+        createHttpMiddleware(),
       ],
     })
 
@@ -39,6 +39,8 @@ export default class CsvParserPrice {
       this.config.strictMode || CONSTANTS.standardOption.strictMode
   }
 
+  // Main function taking in stream of CSV prices streaming out JSON prices
+  // parse :: Stream -> Stream
   parse (input, output) {
     this.logger.info('Starting conversion')
     let rowIndex = 1
@@ -49,7 +51,7 @@ export default class CsvParserPrice {
         separator: this.delimiter,
         strict: this.strictMode,
       }))
-      // Sort by SKU so later when reducing prices we don't have to search
+      // Sort by SKU so later when reducing prices we can easily group by SKU
       .sortBy((a, b) => a['variant-sku'].localeCompare(b['variant-sku']))
       // Limit amount of rows to be handled at the same time
       // Returns an array aka 'batch' of given rows
@@ -63,63 +65,11 @@ export default class CsvParserPrice {
       .flatMap(highland)
       // Unflatten object keys with a dot to nested values
       .map(unflatten)
+      .map(data => this.renameHeaders(data))
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
       .stopOnError(error => this.logger.error(error))
-      .reduce({ prices: [] }, (data, currentPrice) => {
-        /*
-          This reduces all price objects to one object that is acceptable
-          by the price-importer in product-import.
-          It also groups all price object by sku
-          Each price object looks like this:
-          {
-            "sku": "testing",
-            prices: [{
-              value: {
-                "centAmount": 3400,
-                "currencyCode": "EUR"
-              }
-            }]
-          }
-          {
-            "sku": "testing",
-            prices: [{
-              value: {
-                "centAmount": 300,
-                "currencyCode": "EUR"
-              }
-            }]
-          }
-          Resulting object:
-          {
-            "prices": [
-              {
-                "sku": "testing",
-                prices: [{
-                  value: {
-                    "centAmount": 3400,
-                    "currencyCode": "EUR"
-                  }
-                }, {
-                  value: {
-                    "centAmount": 300,
-                    "currencyCode": "EUR"
-                  }
-                }]
-              }
-            ]
-          }
-        */
-
-        const previousPrice = data.prices[data.prices.length - 1]
-
-        if (previousPrice && previousPrice.sku === currentPrice.sku)
-          previousPrice.prices.push(...currentPrice.prices)
-        else
-          data.prices.push(currentPrice)
-
-        return data
-      })
+      .reduce({ prices: [] }, this.mergeBySku)
       .doto((data) => {
         const numberOfPrices = Number(JSON.stringify(data.prices.length)) + 1
         this.logger.info(`Done with conversion of ${numberOfPrices} prices`)
@@ -128,22 +78,85 @@ export default class CsvParserPrice {
       .pipe(output)
   }
 
+  // Rename names for compatibility with price import module
+  // renameHeaders :: Object -> Object
+  // eslint-disable-next-line class-methods-use-this
+  renameHeaders (data) {
+    // Rename groupName to ID
+    if (data.customerGroup && data.customerGroup.groupName) {
+      data.customerGroup.id = data.customerGroup.groupName
+      delete data.customerGroup.groupName
+    }
+
+    // Rename channel key to ID
+    if (data.channel && data.channel.key) {
+      data.channel.id = data.channel.key
+      delete data.channel.key
+    }
+
+    return data
+  }
+
+  // Reduce iterator to merge price objects with the same SKU
+  // mergeBySku :: (Object, Object) -> Object
+  // eslint-disable-next-line class-methods-use-this
+  mergeBySku (data, currentPrice) {
+    /*
+      {
+        "sku": "testing",
+        prices: [{
+          value: {
+            "centAmount": 3400,
+            "currencyCode": "EUR"
+          }
+        }]
+      }
+      {
+        "sku": "testing",
+        prices: [{
+          value: {
+            "centAmount": 300,
+            "currencyCode": "EUR"
+          }
+        }]
+      }
+      Resulting object:
+      {
+        "prices": [
+          {
+            "sku": "testing",
+            prices: [{
+              value: {
+                "centAmount": 3400,
+                "currencyCode": "EUR"
+              }
+            }, {
+              value: {
+                "centAmount": 300,
+                "currencyCode": "EUR"
+              }
+            }]
+          }
+        ]
+      }
+    */
+
+    const previousPrice = data.prices[data.prices.length - 1]
+
+    if (previousPrice && previousPrice.sku === currentPrice.sku)
+      previousPrice.prices.push(...currentPrice.prices)
+    else
+      data.prices.push(currentPrice)
+
+    return data
+  }
+
+  // Fill in references and convert values to their expected type
+  // processData :: (Object, Number) -> Promise -> Object
   processData (data, rowIndex) {
     return new Promise((resolve, reject) => {
       if (data.value && data.value.centAmount)
         data.value.centAmount = parseInt(data.value.centAmount, 10)
-
-      // Rename groupName to ID for compatibility with price import module
-      if (data.customerGroup && data.customerGroup.groupName) {
-        data.customerGroup.id = data.customerGroup.groupName
-        delete data.customerGroup.groupName
-      }
-
-      // Rename channel key to ID for compatibility with price import module
-      if (data.channel && data.channel.key) {
-        data.channel.id = data.channel.key
-        delete data.channel.key
-      }
 
       const price = {
         sku: data[CONSTANTS.header.sku],
@@ -153,7 +166,7 @@ export default class CsvParserPrice {
       if (data.customType) {
         this.logger.verbose('Found custom type')
 
-        return this.processCustomFields(data, rowIndex)
+        return this.processCustomField(data, rowIndex)
           .then((customTypeObj) => {
             data.custom = customTypeObj
             price.prices = [data]
@@ -166,6 +179,8 @@ export default class CsvParserPrice {
     })
   }
 
+  // Delete moved data
+  // cleanOldData :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
   cleanOldData (data) {
     this.logger.verbose('Cleaning leftover data')
@@ -180,10 +195,12 @@ export default class CsvParserPrice {
     return data
   }
 
-  processCustomFields (data, rowIndex) {
+  // Convert custom type value to the expected native type
+  // processCustomField :: (Object, Number) -> Promise -> Object
+  processCustomField (data, rowIndex) {
     this.logger.verbose(`Found custom type at row ${rowIndex}`)
 
-    return this.getCustomTypeDefinition(data.customType).then((customType) => {
+    return this.getCustomFieldDefinition(data.customType).then((customType) => {
       this.logger.info(`Got custom type ${customType}`)
 
       const customTypeObj = mapCustomFields.parse(
@@ -191,16 +208,17 @@ export default class CsvParserPrice {
       )
       if (customTypeObj.error.length)
         return Promise.reject(customTypeObj.error)
+
       return customTypeObj.data
     })
   }
 }
 
-// Easiest way to wrap the getCustomTypeDefinition in the memoize method
-CsvParserPrice.prototype.getCustomTypeDefinition = memoize(
-  function _getCustomTypeDefinition (customTypeKey) {
+// Easiest way to wrap the getCustomFieldDefinition in the memoize method
+// getCustomFieldDefinition :: Function -> String -> Promise -> Object
+CsvParserPrice.prototype.getCustomFieldDefinition = memoize(
+  function _getCustomFieldDefinition (customTypeKey) {
     const getTypeByKeyUri = createRequestBuilder().types
-      // TODO: replace with .byKey
       .where(`key = "${customTypeKey}"`)
       .build({ projectKey: process.env.CT_PROJECT_KEY })
 
@@ -213,6 +231,7 @@ CsvParserPrice.prototype.getCustomTypeDefinition = memoize(
           return Promise.reject(
             new Error(`No type with key '${customTypeKey}' found`)
           )
+
         return response.body.results[0]
       })
   }

@@ -121,14 +121,13 @@ const errorHandler = (errors) => {
 }
 
 // TODO: where is the accessToken gone?
-// TODO: use passed project key and credentials?
 const csvParserPrice = new CsvParserPrice(
   {
-      projectKey: process.env.CT_PROJECT_KEY,
-      credentials: {
-        clientId: process.env.CT_CLIENT_ID,
-        clientSecret: process.env.CT_CLIENT_SECRET,
-      }
+    projectKey: args.projectKey,
+    credentials: {
+      clientId: process.env.CT_CLIENT_ID,
+      clientSecret: process.env.CT_CLIENT_SECRET,
+    },
   },
   {
     error: errorHandler,
