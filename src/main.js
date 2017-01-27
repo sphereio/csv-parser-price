@@ -1,6 +1,7 @@
 import csv from 'csv-parser'
 import highland from 'highland'
 import JSONStream from 'JSONStream'
+import mapValues from 'lodash.mapvalues'
 import memoize from 'lodash.memoize'
 import npmlog from 'npmlog'
 import { unflatten } from 'flat'
@@ -65,7 +66,8 @@ export default class CsvParserPrice {
       .flatMap(highland)
       // Unflatten object keys with a dot to nested values
       .map(unflatten)
-      .map(data => this.renameHeaders(data))
+      .map(this.transformPriceData)
+      .map(this.renameHeaders)
       .flatMap(data => highland(this.processData(data, rowIndex)))
       .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
       .stopOnError(error => this.logger.error(error))
@@ -78,69 +80,45 @@ export default class CsvParserPrice {
       .pipe(output)
   }
 
+  // Transform price values to the type the API expects
+  // transformPriceData :: Object -> Object
+  // eslint-disable-next-line class-methods-use-this
+  transformPriceData (price) {
+    return mapValues(price, (value) => {
+      if (value.centAmount)
+        return Object.assign({}, {
+          centAmount: Number(value.centAmount),
+        })
+
+      return value
+    })
+  }
+
   // Rename names for compatibility with price import module
   // renameHeaders :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
-  renameHeaders (data) {
+  renameHeaders (price) {
+    const newPrice = Object.assign(price)
+
     // Rename groupName to ID
-    if (data.customerGroup && data.customerGroup.groupName) {
-      data.customerGroup.id = data.customerGroup.groupName
-      delete data.customerGroup.groupName
+    if (newPrice.customerGroup && newPrice.customerGroup.groupName) {
+      newPrice.customerGroup.id = newPrice.customerGroup.groupName
+      delete newPrice.customerGroup.groupName
     }
 
     // Rename channel key to ID
-    if (data.channel && data.channel.key) {
-      data.channel.id = data.channel.key
-      delete data.channel.key
+    if (newPrice.channel && newPrice.channel.key) {
+      newPrice.channel.id = newPrice.channel.key
+      delete newPrice.channel.key
     }
 
-    return data
+    return newPrice
   }
 
   // Reduce iterator to merge price objects with the same SKU
   // mergeBySku :: (Object, Object) -> Object
   // eslint-disable-next-line class-methods-use-this
   mergeBySku (data, currentPrice) {
-    /*
-      {
-        "sku": "testing",
-        prices: [{
-          value: {
-            "centAmount": 3400,
-            "currencyCode": "EUR"
-          }
-        }]
-      }
-      {
-        "sku": "testing",
-        prices: [{
-          value: {
-            "centAmount": 300,
-            "currencyCode": "EUR"
-          }
-        }]
-      }
-      Resulting object:
-      {
-        "prices": [
-          {
-            "sku": "testing",
-            prices: [{
-              value: {
-                "centAmount": 3400,
-                "currencyCode": "EUR"
-              }
-            }, {
-              value: {
-                "centAmount": 300,
-                "currencyCode": "EUR"
-              }
-            }]
-          }
-        ]
-      }
-    */
-
     const previousPrice = data.prices[data.prices.length - 1]
 
     if (previousPrice && previousPrice.sku === currentPrice.sku)
@@ -155,9 +133,6 @@ export default class CsvParserPrice {
   // processData :: (Object, Number) -> Promise -> Object
   processData (data, rowIndex) {
     return new Promise((resolve, reject) => {
-      if (data.value && data.value.centAmount)
-        data.value.centAmount = parseInt(data.value.centAmount, 10)
-
       const price = {
         sku: data[CONSTANTS.header.sku],
         prices: [data],
@@ -179,7 +154,7 @@ export default class CsvParserPrice {
     })
   }
 
-  // Delete moved data
+  // Delete leftover data
   // cleanOldData :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
   cleanOldData (data) {

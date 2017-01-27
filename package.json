@@ -60,6 +60,7 @@
     "csv-parser": "^1.11.0",
     "flat": "^2.0.1",
     "highland": "^2.10.1",
+    "lodash.mapvalues": "^4.6.0",
     "lodash.memoize": "^4.1.2",
     "npmlog": "^4.0.1",
     "pretty-error": "^2.0.2",

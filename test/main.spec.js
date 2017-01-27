@@ -91,6 +91,15 @@ test(`CsvParserPrice::parse
   csvParserPrice.parse(readStream, outputStream)
 })
 
+test(`CsvParserPrice::transformPriceData
+  should transform price values to the expected type`, (t) => {
+  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+  const result = csvParserPrice.transformPriceData(priceSample())
+
+  t.equal(result.value.centAmount, 4200)
+  t.end()
+})
+
 test(`CsvParserPrice::processData
   should process object and build valid price object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
@@ -107,7 +116,7 @@ test(`CsvParserPrice::processData
     t.equal(price.country, 'DE', 'Price country parsed successfully')
     t.deepEqual(price.value, {
       currencyCode: 'EUR',
-      centAmount: 4200,
+      centAmount: '4200',
     }, 'Money object built successfully')
     t.notOk(price.customType, 'customType field is removed')
     t.notOk(price.customField, 'customField field is removed')
@@ -149,7 +158,7 @@ test(`CsvParserPrice::processData
     t.equal(price.country, 'DE', 'Price country parsed successfully')
     t.deepEqual(price.value, {
       currencyCode: 'EUR',
-      centAmount: 4200,
+      centAmount: '4200',
     }, 'Money object built successfully')
     t.notOk(price.custom, 'Custom fields obj should not be present')
     t.end()
