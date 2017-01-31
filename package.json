@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "npm run test:watch",
-    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src babel-node node_modules/.bin/tape test/*.spec.js | tap-spec",
+    "test": "npm run build && cross-env NODE_ENV=test NODE_PATH=./src jest",
     "test:watch": "chokidar src test bin -c 'npm test'",
     "build": "npm run clean && babel src bin -d lib",
     "clean": "rimraf lib/*",
@@ -70,6 +70,7 @@
   "devDependencies": {
     "babel-cli": "^6.14.0",
     "babel-eslint": "^7.1.1",
+    "babel-jest": "^18.0.0",
     "babel-plugin-istanbul": "^3.0.0",
     "babel-preset-es2015": "^6.14.0",
     "chokidar-cli": "^1.2.0",
@@ -85,12 +86,12 @@
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.3.0",
     "ghooks": "^1.3.2",
+    "jest": "^18.1.0",
     "nyc": "^10.0.0",
     "rimraf": "^2.5.4",
     "sinon": "^1.17.6",
     "streamtest": "^1.2.2",
     "tap-spec": "^4.1.1",
-    "tape": "^4.6.0",
     "tmp": "^0.0.31",
     "validate-commit-msg": "^2.8.0"
   },
@@ -105,6 +106,9 @@
   },
   "eslintConfig": {
     "extends": "commercetools",
+    "env": {
+      "jest": true
+    },
     "settings": {
       "import/resolver": {
         "node": {

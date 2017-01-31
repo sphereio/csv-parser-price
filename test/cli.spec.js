@@ -6,7 +6,6 @@ import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
 
 import { exec } from 'child_process'
 import fs from 'fs'
-import test from 'tape'
 import tmp from 'tmp'
 import { version } from '../package.json'
 
@@ -29,96 +28,90 @@ const client = createClient({
   ],
 })
 
-test('CLI help flag', (t) => {
+it('CLI help flag', (done) => {
   exec(`${binPath} --help`, (error, stdout, stderr) => {
-    t.true(String(stdout).match(/help/), 'outputs help text')
-    t.false(error && stderr, 'returns no error')
-    t.end()
+    expect(String(stdout).match(/help/)).toBeTruthy()
+    expect(error && stderr).toBeFalsy()
+    done()
   })
 })
 
-test('CLI version flag', (t) => {
+it('CLI version flag', (done) => {
   exec(`${binPath} --version`, (error, stdout, stderr) => {
-    t.equal(stdout, `${version}\n`, 'outputs current version number')
-    t.false(error && stderr, 'returns no error')
-    t.end()
+    expect(stdout).toBe(`${version}\n`)
+    expect(error && stderr).toBeFalsy()
+    done()
   })
 })
 
-test('CLI takes input from file', (t) => {
+it('CLI takes input from file', (done) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
 
   exec(`${binPath} -p ${config.projectKey} --inputFile ${csvFilePath}`,
     (error, stdout, stderr) => {
-      t.true(stdout.match(/prices/), 'outputs data including \'prices\'')
-      t.false(error && stderr, 'returns no error')
-      t.end()
+      expect(stdout.match(/prices/)).toBeTruthy()
+      expect(error && stderr).toBeFalsy()
+      done()
     }
   )
 })
 
-test('CLI writes output to file', (t) => {
+it('CLI writes output to file', (done) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
   // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (cliError, stdout, stderr) => {
-      t.false(cliError && stderr, 'returns no CLI error')
+      expect(cliError && stderr).toBeFalsy()
 
       fs.readFile(jsonFilePath, { encoding: 'utf8' }, (error, data) => {
-        t.true(data.match(/prices/), 'writes data including \'prices\'')
-        t.false(error, 'returns no FS error')
-        t.end()
+        expect(data.match(/prices/)).toBeTruthy()
+        expect(error).toBeFalsy()
+        done()
       })
     }
   )
 })
 
-test('CLI given a non-existant input file', (t) => {
+it('CLI given a non-existant input file', (done) => {
   exec(`${binPath} -i nope.csv`, (error) => {
-    t.true(error, 'returns error')
-    t.end()
+    expect(error).toBeTruthy()
+    done()
   })
 })
 
-test('CLI exits on faulty CSV format', (t) => {
+it('CLI exits on faulty CSV format', (done) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
   // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
-      t.equal(error.code, 1, 'returns process error exit code')
-      t.false(stdout, 'returns no stdout data')
-      t.true(
-        stderr.match(/Row length does not match headers/),
-        'returns CSV parsing error on stderr'
-      )
-      t.end()
+      expect(error.code).toBe(1)
+      expect(stdout).toBeFalsy()
+      expect(stderr.match(/Row length does not match headers/)).toBeTruthy()
+      done()
     }
   )
 })
 
-test('CLI exits on parsing errors', (t) => {
+it('CLI exits on parsing errors', (done) => {
   const csvFilePath = './test/helpers/missing-type-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
   // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
-      t.equal(error.code, 1, 'returns process error exit code')
-      t.false(stdout, 'returns no stdout data')
-      t.true(
-        stderr.match(/No type with key .+ found/),
-        'returns SDK error on stderr'
-      )
-      t.end()
+      expect(error.code).toBe(1)
+      expect(stdout).toBeFalsy()
+      expect(stderr.match(/No type with key .+ found/)).toBeTruthy()
+      done()
     }
   )
 })
 
-test('CLI exits on type mapping errors', (t) => {
+it('CLI exits on type mapping errors', (done) => {
   const csvFilePath = './test/helpers/sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
@@ -154,31 +147,25 @@ test('CLI exits on type mapping errors', (t) => {
       // eslint-disable-next-line max-len
       exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
         (error, stdout, stderr) => {
-          t.equal(error.code, 1, 'returns process error exit code')
-          t.false(stdout, 'returns no stdout data')
-          t.true(
-            stderr.match(/row 2: custom-type.+ valid/),
-            'returns mapping error on stderr'
-          )
-          t.end()
+          expect(error.code).toBe(1)
+          expect(stdout).toBeFalsy()
+          expect(stderr.match(/row 2: custom-type.+ valid/)).toBeTruthy()
+          done()
         }
       )
     })
 })
 
-test('CLI logs stack trace on verbose level', (t) => {
+it('CLI logs stack trace on verbose level', (done) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
 
   // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} --logLevel verbose`,
     (error, stdout, stderr) => {
-      t.equal(error.code, 1, 'returns process error exit code')
-      t.false(stdout, 'returns no stdout data')
-      t.true(
-        stderr.match(/\.js:\d+:\d+/),
-        'returns stack trace error on stderr'
-      )
-      t.end()
+      expect(error.code).toBe(1)
+      expect(stdout).toBeFalsy()
+      expect(stderr.match(/\.js:\d+:\d+/)).toBeTruthy()
+      done()
     }
   )
 })

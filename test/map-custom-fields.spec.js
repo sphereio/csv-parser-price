@@ -1,33 +1,29 @@
 import mapCustomFields from 'map-custom-fields'
-import test from 'tape'
 
 import customTypeSample from './helpers/custom-type-sample.json'
 
-test('mapCustomFields should exist', (t) => {
-  t.ok(mapCustomFields)
-  t.end()
+it('mapCustomFields should exist', () => {
+  expect(mapCustomFields).toBeTruthy()
 })
 
-test('mapCustomFields should have methods', (t) => {
-  t.equal(typeof mapCustomFields, 'object', 'mapCustomFields is an object')
+it('mapCustomFields should have methods', () => {
+  expect(typeof mapCustomFields).toBe('object')
 
-  t.ok(mapCustomFields.mapBoolean, 'mapBoolean method exists')
-  t.ok(mapCustomFields.parse, 'parse method exists')
-  t.ok(mapCustomFields.mapMoney, 'mapMoney method exists')
-  t.ok(mapCustomFields.mapSet, 'mapSet method exists')
-  t.ok(mapCustomFields.mapNumber, 'mapNumber method exists')
-  t.notOk(mapCustomFields.isValidValue, 'isValidValue is a private method')
-  t.end()
+  expect(mapCustomFields.mapBoolean).toBeTruthy()
+  expect(mapCustomFields.parse).toBeTruthy()
+  expect(mapCustomFields.mapMoney).toBeTruthy()
+  expect(mapCustomFields.mapSet).toBeTruthy()
+  expect(mapCustomFields.mapNumber).toBeTruthy()
+  expect(mapCustomFields.isValidValue).toBeFalsy()
 })
 
-test(`mapCustomFields::mapBoolean
-  should exists`, (t) => {
-  t.ok(mapCustomFields.mapBoolean)
-  t.end()
+it(`mapCustomFields::mapBoolean
+  should exists`, () => {
+  expect(mapCustomFields.mapBoolean).toBeTruthy()
 })
 
-test(`mapCustomFields::parse
-  should return valid customfields object`, (t) => {
+it(`mapCustomFields::parse
+  should return valid customfields object`, () => {
   const data = {
     numbertype: '123',
     stringtype: 'nac',
@@ -43,7 +39,7 @@ test(`mapCustomFields::parse
 
   const result = mapCustomFields.parse(data, customTypeSample, 1)
 
-  t.equal(result.error.length, 0, 'There is no error')
+  expect(result.error.length).toBe(0)
   const expected = {
     fields: {
       booleantype: true,
@@ -64,13 +60,11 @@ test(`mapCustomFields::parse
       id: '53 45 4c 57 59 4e 2e',
     },
   }
-  const testMsg = 'Data is parsed successfully'
-  t.deepEqual(result.data, expected, testMsg)
-  t.end()
+  expect(result.data).toEqual(expected)
 })
 
-test(`mapCustomFields::parse
-  should return errors with customfields object`, (t) => {
+it(`mapCustomFields::parse
+  should return errors with customfields object`, () => {
   const data = {
     numbertype: 'invalid',
     unsupportedType: 'okay',
@@ -87,7 +81,7 @@ test(`mapCustomFields::parse
 
   const result = mapCustomFields.parse(data, customTypeSample, 1)
 
-  t.equal(result.error.length, 8, 'There are errors with data')
+  expect(result.error.length).toBe(8)
   const expected = {
     fields: {
       enumtype: 'Ready',
@@ -100,7 +94,6 @@ test(`mapCustomFields::parse
       id: '53 45 4c 57 59 4e 2e',
     },
   }
-  const errMsg = 'All errors are returned'
   const expectedErrorArray = [
     '[row 1: liqui 63 69 ty] - The number invalid isn\'t valid',
     // eslint-disable-next-line max-len
@@ -112,151 +105,131 @@ test(`mapCustomFields::parse
     '[row 1: liqui 63 69 ty] - The number v isn\'t valid',
     '[row 1: liqui 63 69 ty] - The number t isn\'t valid',
   ]
-  t.deepEqual(result.data, expected)
-  t.deepEqual(
-    result.error.map(error => error.message),
-    expectedErrorArray,
-    errMsg
-  )
-  t.end()
+  expect(result.data).toEqual(expected)
+  expect(result.error.map(error => error.message)).toEqual(expectedErrorArray)
 })
 
-test(`mapCustomFields::mapBoolean
-  should return boolean value when passed in`, (t) => {
+it(`mapCustomFields::mapBoolean
+  should return boolean value when passed in`, () => {
   const result = mapCustomFields.mapBoolean('true')
 
-  t.notOk(result.error, 'There is no error')
-  t.equal(result.data, true, 'String value `true` is converted to boolean')
-  t.end()
+  expect(result.error).toBeFalsy()
+  expect(result.data).toBe(true)
 })
 
-test(`mapCustomFields::mapBoolean
-  should return no error or data when value is empty`, (t) => {
+it(`mapCustomFields::mapBoolean
+  should return no error or data when value is empty`, () => {
   const result = mapCustomFields.mapBoolean('')
 
-  t.notOk(result.error, 'There is no error')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeFalsy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapBoolean
-  should return error when value is not valid boolean`, (t) => {
+it(`mapCustomFields::mapBoolean
+  should return error when value is not valid boolean`, () => {
   const result = mapCustomFields.mapBoolean('{"ok":"yes"}')
 
-  t.ok(result.error, 'There are errors with input')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeTruthy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapBoolean
-  should return error when invalid value is passed in`, (t) => {
+it(`mapCustomFields::mapBoolean
+  should return error when invalid value is passed in`, () => {
   const result = mapCustomFields.mapBoolean('abi')
 
-  t.ok(result.error, 'There are errors with input')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeTruthy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapMoney
-  should exists`, (t) => {
-  t.ok(mapCustomFields.mapMoney)
-  t.end()
+it(`mapCustomFields::mapMoney
+  should exists`, () => {
+  expect(mapCustomFields.mapMoney).toBeTruthy()
 })
 
-test(`mapCustomFields::mapMoney
-  should return money object when passed in`, (t) => {
+it(`mapCustomFields::mapMoney
+  should return money object when passed in`, () => {
   const result = mapCustomFields.mapMoney('EUR 1400')
 
-  t.notOk(result.error, 'There is no error')
+  expect(result.error).toBeFalsy()
   const expected = { centAmount: 1400, currencyCode: 'EUR' }
-  t.deepEqual(result.data, expected, 'Money is parsed successfully')
-  t.end()
+  expect(result.data).toEqual(expected)
 })
 
-test(`mapCustomFields::mapMoney
-  should return error when invalid value is passed in`, (t) => {
+it(`mapCustomFields::mapMoney
+  should return error when invalid value is passed in`, () => {
   const result = mapCustomFields.mapMoney('abi')
 
-  t.ok(result.error, 'There is error')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeTruthy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapMoney
-  should return no error or data when value is empty`, (t) => {
+it(`mapCustomFields::mapMoney
+  should return no error or data when value is empty`, () => {
   const result = mapCustomFields.mapMoney('')
 
-  t.notOk(result.error, 'There is no error')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeFalsy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapNumber
-  should exists`, (t) => {
-  t.ok(mapCustomFields.mapNumber)
-  t.end()
+it(`mapCustomFields::mapNumber
+  should exists`, () => {
+  expect(mapCustomFields.mapNumber).toBeTruthy()
 })
 
-test(`mapCustomFields::mapNumber
-  should return a valid number when passed in`, (t) => {
+it(`mapCustomFields::mapNumber
+  should return a valid number when passed in`, () => {
   const result = mapCustomFields.mapNumber('1400')
 
-  t.notOk(result.error, 'There is no error')
-  t.equal(result.data, 1400, 'Number of type `number`')
-  t.end()
+  expect(result.error).toBeFalsy()
+  expect(result.data).toBe(1400)
 })
 
-test(`mapCustomFields::mapNumber
-  should parse a valid floating number`, (t) => {
+it(`mapCustomFields::mapNumber
+  should parse a valid floating number`, () => {
   const result = mapCustomFields.mapNumber('0.5')
 
-  t.notOk(result.error, 'There is no error')
-  t.equal(result.data, 0.5, 'Floating numbers is parsed successfully')
-  t.end()
+  expect(result.error).toBeFalsy()
+  expect(result.data).toBe(0.5)
 })
 
-test(`mapCustomFields::mapNumber
-  should return error when invalid value is passed in`, (t) => {
+it(`mapCustomFields::mapNumber
+  should return error when invalid value is passed in`, () => {
   const result = mapCustomFields.mapNumber('abi')
 
-  t.ok(result.error, 'There are errors with input')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeTruthy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapNumber
-  should return no error or data when value is empty`, (t) => {
+it(`mapCustomFields::mapNumber
+  should return no error or data when value is empty`, () => {
   const result = mapCustomFields.mapNumber('')
 
-  t.notOk(result.error, 'There is no error')
-  t.notOk(result.data, 'No data is returned')
-  t.end()
+  expect(result.error).toBeFalsy()
+  expect(result.data).toBeFalsy()
 })
 
-test(`mapCustomFields::mapSet
-  should exists`, (t) => {
-  t.ok(mapCustomFields.mapSet)
-  t.end()
+it(`mapCustomFields::mapSet
+  should exists`, () => {
+  expect(mapCustomFields.mapSet).toBeTruthy()
 })
 
-test(`mapCustomFields::mapSet
-  should format all values to money`, (t) => {
+it(`mapCustomFields::mapSet
+  should format all values to money`, () => {
   const elementType = { name: 'Number' }
   const result = mapCustomFields.mapSet('1,2,3,4', elementType)
 
-  t.equal(result.error.length, 0, 'There is no error')
+  expect(result.error.length).toBe(0)
   const expected = [1, 2, 3, 4]
-  t.deepEqual(result.data, expected, 'Values are all Numbers')
-  t.end()
+  expect(result.data).toEqual(expected)
 })
 
-test(`mapCustomFields::mapSet
-  should format all values to money`, (t) => {
+it(`mapCustomFields::mapSet
+  should format all values to money`, () => {
   const elementType = { name: 'Money' }
   const moneySet = 'EUR 1200,USD 40,NGN 200'
   const result = mapCustomFields.mapSet(moneySet, elementType)
 
-  t.equal(result.error.length, 0, 'There is no error')
+  expect(result.error.length).toBe(0)
   const expected = [{
     currencyCode: 'EUR',
     centAmount: 1200,
@@ -267,43 +240,39 @@ test(`mapCustomFields::mapSet
     currencyCode: 'NGN',
     centAmount: 200,
   }]
-  t.deepEqual(result.data, expected, 'Values are all money object')
-  t.end()
+  expect(result.data).toEqual(expected)
 })
 
-test(`mapCustomFields::mapSet
-  should return error if values in set is invalid`, (t) => {
+it(`mapCustomFields::mapSet
+  should return error if values in set is invalid`, () => {
   const elementType = { name: 'Boolean' }
   const moneySet = 'true, false, false, abi'
   const result = mapCustomFields.mapSet(moneySet, elementType)
-  t.equal(result.error.length, 1, 'There is error with input')
-  t.deepEqual(result.error[0], 'The value \'abi\' is not a valid boolean value')
-  t.equal(result.data.length, 3, 'Other non-error input are returned')
-  t.end()
+  expect(result.error.length).toBe(1)
+  expect(result.error[0])
+    .toEqual('The value \'abi\' is not a valid boolean value')
+  expect(result.data.length).toBe(3)
 })
 
-test(`mapCustomFields::mapSet
-  should return error if elementType in set is not supported`, (t) => {
+it(`mapCustomFields::mapSet
+  should return error if elementType in set is not supported`, () => {
   const elementType = { name: 'unsupportedType' }
   const moneySet = 'true, false, false, abi'
   const result = mapCustomFields.mapSet(moneySet, elementType)
 
-  t.equal(result.error.length, 4, 'There is error with input')
-  t.deepEqual(
-    result.error[0],
+  expect(result.error.length).toBe(4)
+  expect(result.error[0]).toEqual(
     '\'unsupportedType\' type is not supported! Kindly raise an issue for this'
   )
-  t.end()
 })
 
-test(`mapCustomFields::mapSet
-  should parse all values as a string`, (t) => {
+it(`mapCustomFields::mapSet
+  should parse all values as a string`, () => {
   const elementType = { name: 'String' }
   const moneySet = 'shoe, monitor, abi'
   const result = mapCustomFields.mapSet(moneySet, elementType)
 
-  t.ok(result.error, 'There is no error with input')
+  expect(result.error).toBeTruthy()
   const expected = ['shoe', 'monitor', 'abi']
-  t.deepEqual(result.data, expected, 'All values are of type String')
-  t.end()
+  expect(result.data).toEqual(expected)
 })

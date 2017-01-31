@@ -3,7 +3,6 @@ import fs from 'fs'
 import path from 'path'
 import sinon from 'sinon'
 import StreamTest from 'streamtest'
-import test from 'tape'
 
 import CONSTANTS from '../src/constants'
 import priceSample from './helpers/price-sample'
@@ -25,32 +24,23 @@ const apiClientConfig = {
   },
 }
 
-test(`CsvParserPrice
-  should initialize default values`, (t) => {
+it(`CsvParserPrice
+  should initialize default values`, () => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig)
 
   // logger
-  t.deepEqual(
-    Object.keys(csvParserPrice.logger),
-    ['error', 'warn', 'info', 'verbose'],
-    'logger should have expected keys'
-  )
+  expect(Object.keys(csvParserPrice.logger))
+    .toEqual(['error', 'warn', 'info', 'verbose'])
   Object.keys(csvParserPrice.logger).forEach((key) => {
-    t.equal(typeof csvParserPrice.logger[key], 'function')
+    expect(typeof csvParserPrice.logger[key]).toBe('function')
   })
 
   // config
-  t.equal(
-    csvParserPrice.batchSize,
-    CONSTANTS.standardOption.batchSize,
-    'parser option should be set to the standard value'
-  )
-
-  t.end()
+  expect(csvParserPrice.batchSize).toBe(CONSTANTS.standardOption.batchSize)
 })
 
-test(`CsvParserPrice::parse
-  should accept a stream and output a stream`, (t) => {
+it(`CsvParserPrice::parse
+  should accept a stream and output a stream`, (done) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
@@ -62,15 +52,15 @@ test(`CsvParserPrice::parse
 
   const outputStream = StreamTest['v2'].toText((error, result) => {
     const prices = JSON.parse(result)
-    t.equal(prices.length, 2, 'All prices from the csv are parsed')
-    t.ok(prices[0][CONSTANTS.header.sku], 'Sku exists on price object')
-    t.end()
+    expect(prices.length).toBe(2)
+    expect(prices[0][CONSTANTS.header.sku]).toBeTruthy()
+    done()
   })
   csvParserPrice.parse(readStream, outputStream)
 })
 
-test(`CsvParserPrice::parse
-  should group prices by variants sku`, (t) => {
+it(`CsvParserPrice::parse
+  should group prices by variants sku`, (done) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const readStream = fs.createReadStream(
     path.join(__dirname, 'helpers/sample.csv')
@@ -82,26 +72,25 @@ test(`CsvParserPrice::parse
 
   const outputStream = StreamTest['v2'].toText((error, result) => {
     const prices = JSON.parse(result)
-    t.equal(prices.length, 2, 'All prices from the csv is parsed')
-    t.equal(prices[0].prices.length, 2, 'price with similar skus are grouped')
-    t.equal(prices[1].prices.length, 1, 'price with similar skus are grouped')
-    t.ok(prices[0][CONSTANTS.header.sku], 'Sku exists on price object')
-    t.end()
+    expect(prices.length).toBe(2)
+    expect(prices[0].prices.length).toBe(2)
+    expect(prices[1].prices.length).toBe(1)
+    expect(prices[0][CONSTANTS.header.sku]).toBeTruthy()
+    done()
   })
   csvParserPrice.parse(readStream, outputStream)
 })
 
-test(`CsvParserPrice::transformPriceData
-  should transform price values to the expected type`, (t) => {
+it(`CsvParserPrice::transformPriceData
+  should transform price values to the expected type`, () => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const result = csvParserPrice.transformPriceData(priceSample())
 
-  t.equal(result.value.centAmount, 4200)
-  t.end()
+  expect(result.value.centAmount).toBe(4200)
 })
 
-test(`CsvParserPrice::transformCustomData
-  should process object and build valid price object`, (t) => {
+it(`CsvParserPrice::transformCustomData
+  should process object and build valid price object`, (done) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
   sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
@@ -109,27 +98,24 @@ test(`CsvParserPrice::transformCustomData
   )
 
   csvParserPrice.transformCustomData(priceSample(), 2).then((result) => {
-    t.deepEqual(
-      result.custom,
-      {
-        type: { id: '53 45 4c 57 59 4e 2e' },
-        fields: {
-          booleantype: true,
-          localizedstringtype: { de: 'Merkel', nl: 'Selwyn' },
-          moneytype: { centAmount: 1200, currencyCode: 'EUR' },
-          numbertype: 12,
-          settype: [ 1, 2, 3, 5 ],
-          stringtype: 'nac',
-        },
+    expect(result.custom).toEqual({
+      type: { id: '53 45 4c 57 59 4e 2e' },
+      fields: {
+        booleantype: true,
+        localizedstringtype: { de: 'Merkel', nl: 'Selwyn' },
+        moneytype: { centAmount: 1200, currencyCode: 'EUR' },
+        numbertype: 12,
+        settype: [ 1, 2, 3, 5 ],
+        stringtype: 'nac',
       },
-      'Price custom fields object is built')
-    t.end()
+    })
+    done()
   })
 })
 
-test(`CsvParserPrice::renameHeaders
+it(`CsvParserPrice::renameHeaders
   should rename customerGroup.groupName to customerGroup.id
-  for compatibility with product price import module`, (t) => {
+  for compatibility with product price import module`, () => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const modifiedPriceSample = priceSample()
   delete modifiedPriceSample.customType
@@ -138,17 +124,13 @@ test(`CsvParserPrice::renameHeaders
 
   const result = csvParserPrice.renameHeaders(modifiedPriceSample)
 
-  t.false(result.customerGroup.groupName, 'Group name is deleted')
-  t.equal(
-    result.customerGroup.id, 'customer-group',
-    'Customer group ID has group name value'
-  )
-  t.end()
+  expect(result.customerGroup.groupName).toBeFalsy()
+  expect(result.customerGroup.id).toBe('customer-group')
 })
 
-test(`CsvParserPrice::renameHeaders
+it(`CsvParserPrice::renameHeaders
   should rename channel.key to channel.id
-  for compatibility with product price import module`, (t) => {
+  for compatibility with product price import module`, () => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const modifiedPriceSample = priceSample()
   delete modifiedPriceSample.customType
@@ -157,16 +139,12 @@ test(`CsvParserPrice::renameHeaders
 
   const result = csvParserPrice.renameHeaders(modifiedPriceSample)
 
-  t.false(result.channel.key, 'Channel key is deleted')
-  t.equal(
-    result.channel.id, 'my-channel',
-    'Channel ID has channel key value'
-  )
-  t.end()
+  expect(result.channel.key).toBeFalsy()
+  expect(result.channel.id).toBe('my-channel')
 })
 
-test(`CsvParserPrice::processCustomField
-  should build custom object`, (t) => {
+it(`CsvParserPrice::processCustomField
+  should build custom object`, (done) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
   sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
@@ -174,8 +152,8 @@ test(`CsvParserPrice::processCustomField
   )
 
   csvParserPrice.processCustomField(priceSample(), 2).then((result) => {
-    t.ok(result.fields, 'Custom fields object is present')
-    t.ok(result.type, 'CustomObject is present')
+    expect(result.fields).toBeTruthy()
+    expect(result.type).toBeTruthy()
     const expected = {
       type: {
         id: '53 45 4c 57 59 4e 2e',
@@ -189,13 +167,13 @@ test(`CsvParserPrice::processCustomField
         stringtype: 'nac',
       },
     }
-    t.deepEqual(result, expected)
-    t.end()
+    expect(result).toEqual(expected)
+    done()
   })
 })
 
-test(`CsvParserPrice::processCustomField
-  should build report errors on data`, (t) => {
+it(`CsvParserPrice::processCustomField
+  should build report errors on data`, (done) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
   const modifiedPriceSample = priceSample()
 
@@ -205,26 +183,23 @@ test(`CsvParserPrice::processCustomField
   )
 
   csvParserPrice.processCustomField(modifiedPriceSample, 2).then((result) => {
-    t.fail()
-    t.notOk(result)
-    t.end()
+    done.fail()
+    expect(result).toBeFalsy()
+    done()
   }, (error) => {
-    t.equal(error.length, 1, 'Errors with data are reported')
-    t.equal(
-      error[0].message,
-      '[row 2: liqui 63 69 ty] - The number \'2\' isn\'t valid'
-    )
-    t.end()
+    expect(error.length).toBe(1)
+    expect(error[0].message)
+      .toBe('[row 2: liqui 63 69 ty] - The number \'2\' isn\'t valid')
+    done()
   })
 })
 
-test(`CsvParserPrice::deleteMovedData
-  should delete leftover data if present`, (t) => {
+it(`CsvParserPrice::deleteMovedData
+  should delete leftover data if present`, () => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
   const result = csvParserPrice.deleteMovedData(priceSample())
 
-  t.notOk(result.customField, 'removed customField')
-  t.notOk(result.customType, 'removed customField')
-  t.end()
+  expect(result.customField).toBeFalsy()
+  expect(result.customType).toBeFalsy()
 })
