@@ -61,6 +61,7 @@ test('CLI writes output to file', (t) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
+  // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (cliError, stdout, stderr) => {
       t.false(cliError && stderr, 'returns no CLI error')
@@ -85,6 +86,7 @@ test('CLI exits on faulty CSV format', (t) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
+  // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
@@ -102,13 +104,15 @@ test('CLI exits on parsing errors', (t) => {
   const csvFilePath = './test/helpers/missing-type-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
+  // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
       t.true(
         stderr.match(/No type with key .+ found/),
-        'returns SDK error on stderr')
+        'returns SDK error on stderr'
+      )
       t.end()
     }
   )
@@ -147,13 +151,15 @@ test('CLI exits on type mapping errors', (t) => {
       method: 'POST',
     }))
     .then(() => {
+      // eslint-disable-next-line max-len
       exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
         (error, stdout, stderr) => {
           t.equal(error.code, 1, 'returns process error exit code')
           t.false(stdout, 'returns no stdout data')
           t.true(
             stderr.match(/row 2: custom-type.+ valid/),
-            'returns mapping error on stderr')
+            'returns mapping error on stderr'
+          )
           t.end()
         }
       )
@@ -161,15 +167,17 @@ test('CLI exits on type mapping errors', (t) => {
 })
 
 test('CLI logs stack trace on verbose level', (t) => {
-  const csvFilePath = './test/helpers/missing-type-sample.csv'
+  const csvFilePath = './test/helpers/faulty-sample.csv'
 
+  // eslint-disable-next-line max-len
   exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} --logLevel verbose`,
     (error, stdout, stderr) => {
       t.equal(error.code, 1, 'returns process error exit code')
       t.false(stdout, 'returns no stdout data')
       t.true(
-        stderr.match(/process._tickCallback/),
-        'returns stack trace error on stderr')
+        stderr.match(/\.js:\d+:\d+/),
+        'returns stack trace error on stderr'
+      )
       t.end()
     }
   )

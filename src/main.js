@@ -40,7 +40,6 @@ export default class CsvParserPrice {
       this.config.strictMode || CONSTANTS.standardOption.strictMode
   }
 
-  // Main function taking in stream of CSV prices streaming out JSON prices
   // parse :: Stream -> Stream
   parse (input, output) {
     this.logger.info('Starting conversion')
@@ -55,25 +54,25 @@ export default class CsvParserPrice {
       // Sort by SKU so later when reducing prices we can easily group by SKU
       .sortBy((a, b) => a['variant-sku'].localeCompare(b['variant-sku']))
       // Limit amount of rows to be handled at the same time
-      // Returns an array aka 'batch' of given rows
       .batch(this.batchSize)
       .stopOnError(error => this.logger.error(error))
       .doto(() => {
         this.logger.verbose(`Parsed row ${rowIndex}`)
         rowIndex += 1
       })
-      // Flatten batch of rows
+      // Flatten batch of rows to stream
       .flatMap(highland)
       // Unflatten object keys with a dot to nested values
       .map(unflatten)
       .map(this.transformPriceData)
       .map(this.renameHeaders)
-      .flatMap(data => highland(this.processData(data, rowIndex)))
+      .flatMap(data => highland(this.transformCustomData(data, rowIndex)))
+      .map(this.deleteMovedData)
       .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
       .stopOnError(error => this.logger.error(error))
-      .reduce({ prices: [] }, this.mergeBySku)
+      .reduce([], this.mergeBySku)
       .doto((data) => {
-        const numberOfPrices = Number(JSON.stringify(data.prices.length)) + 1
+        const numberOfPrices = Number(JSON.stringify(data.length)) + 1
         this.logger.info(`Done with conversion of ${numberOfPrices} prices`)
       })
       .pipe(JSONStream.stringify(false))
@@ -86,27 +85,43 @@ export default class CsvParserPrice {
   transformPriceData (price) {
     return mapValues(price, (value) => {
       if (value.centAmount)
-        return Object.assign({}, {
+        return {
           centAmount: Number(value.centAmount),
-        })
+        }
 
       return value
     })
   }
 
-  // Rename names for compatibility with price import module
+  transformCustomData (price, rowIndex) {
+    if (price.customType) {
+      this.logger.verbose('Found custom type')
+
+      return this.processCustomField(price, rowIndex)
+        // Using arrow without body trips up babel transform-object-rest-spread
+        // eslint-disable-next-line arrow-body-style
+        .then((customTypeObj) => {
+          return {
+            ...price,
+            custom: customTypeObj,
+          }
+        })
+    }
+
+    return Promise.resolve(price)
+  }
+
+  // Rename for compatibility with price import module
   // renameHeaders :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
   renameHeaders (price) {
     const newPrice = Object.assign(price)
 
-    // Rename groupName to ID
     if (newPrice.customerGroup && newPrice.customerGroup.groupName) {
       newPrice.customerGroup.id = newPrice.customerGroup.groupName
       delete newPrice.customerGroup.groupName
     }
 
-    // Rename channel key to ID
     if (newPrice.channel && newPrice.channel.key) {
       newPrice.channel.id = newPrice.channel.key
       delete newPrice.channel.key
@@ -115,59 +130,34 @@ export default class CsvParserPrice {
     return newPrice
   }
 
-  // Reduce iterator to merge price objects with the same SKU
   // mergeBySku :: (Object, Object) -> Object
   // eslint-disable-next-line class-methods-use-this
-  mergeBySku (data, currentPrice) {
-    const previousPrice = data.prices[data.prices.length - 1]
+  mergeBySku (prices, currentPrice) {
+    const previousPrice = prices[prices.length - 1]
+    const sku = CONSTANTS.header.sku
 
-    if (previousPrice && previousPrice.sku === currentPrice.sku)
-      previousPrice.prices.push(...currentPrice.prices)
+    if (previousPrice && previousPrice[sku] === currentPrice[sku])
+      previousPrice.prices.push(currentPrice)
     else
-      data.prices.push(currentPrice)
+      prices.push({
+        [sku]: currentPrice[sku],
+        prices: [currentPrice],
+      })
 
-    return data
+    return prices
   }
 
-  // Fill in references and convert values to their expected type
-  // processData :: (Object, Number) -> Promise -> Object
-  processData (data, rowIndex) {
-    return new Promise((resolve, reject) => {
-      const price = {
-        sku: data[CONSTANTS.header.sku],
-        prices: [data],
-      }
-
-      if (data.customType) {
-        this.logger.verbose('Found custom type')
-
-        return this.processCustomField(data, rowIndex)
-          .then((customTypeObj) => {
-            data.custom = customTypeObj
-            price.prices = [data]
-            resolve(this.cleanOldData(price))
-          })
-          .catch(reject)
-      }
-
-      return resolve(this.cleanOldData(price))
-    })
-  }
-
-  // Delete leftover data
-  // cleanOldData :: Object -> Object
+  // deleteMovedData :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
-  cleanOldData (data) {
-    this.logger.verbose('Cleaning leftover data')
+  deleteMovedData (price) {
+    const newPrice = Object.assign(price)
 
-    const priceObj = data.prices[0]
-    if (priceObj.customType)
-      delete priceObj.customType
-    if (priceObj.customField)
-      delete priceObj.customField
-    if (priceObj[CONSTANTS.header.sku])
-      delete priceObj[CONSTANTS.header.sku]
-    return data
+    if (newPrice.customField)
+      delete newPrice.customField
+    if (newPrice.customType)
+      delete newPrice.customType
+
+    return newPrice
   }
 
   // Convert custom type value to the expected native type

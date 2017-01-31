@@ -61,9 +61,9 @@ test(`CsvParserPrice::parse
   )
 
   const outputStream = StreamTest['v2'].toText((error, result) => {
-    const prices = JSON.parse(result).prices
+    const prices = JSON.parse(result)
     t.equal(prices.length, 2, 'All prices from the csv are parsed')
-    t.ok(prices[0].sku, 'Sku exists on price object')
+    t.ok(prices[0][CONSTANTS.header.sku], 'Sku exists on price object')
     t.end()
   })
   csvParserPrice.parse(readStream, outputStream)
@@ -81,11 +81,11 @@ test(`CsvParserPrice::parse
   )
 
   const outputStream = StreamTest['v2'].toText((error, result) => {
-    const prices = JSON.parse(result).prices
+    const prices = JSON.parse(result)
     t.equal(prices.length, 2, 'All prices from the csv is parsed')
     t.equal(prices[0].prices.length, 2, 'price with similar skus are grouped')
     t.equal(prices[1].prices.length, 1, 'price with similar skus are grouped')
-    t.ok(prices[0].sku, 'Sku exists on price object')
+    t.ok(prices[0][CONSTANTS.header.sku], 'Sku exists on price object')
     t.end()
   })
   csvParserPrice.parse(readStream, outputStream)
@@ -100,7 +100,7 @@ test(`CsvParserPrice::transformPriceData
   t.end()
 })
 
-test(`CsvParserPrice::processData
+test(`CsvParserPrice::transformCustomData
   should process object and build valid price object`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
@@ -108,21 +108,9 @@ test(`CsvParserPrice::processData
     Promise.resolve(customTypeSample)
   )
 
-  csvParserPrice.processData(priceSample(), 2).then((result) => {
-    t.ok(result)
-    t.ok(result.sku)
-    t.equal(result.prices.length, 1, 'One price object is built')
-    const price = result.prices[0]
-    t.equal(price.country, 'DE', 'Price country parsed successfully')
-    t.deepEqual(price.value, {
-      currencyCode: 'EUR',
-      centAmount: '4200',
-    }, 'Money object built successfully')
-    t.notOk(price.customType, 'customType field is removed')
-    t.notOk(price.customField, 'customField field is removed')
-    t.notOk(price[CONSTANTS.header.sku], 'variant-sku field is removed')
+  csvParserPrice.transformCustomData(priceSample(), 2).then((result) => {
     t.deepEqual(
-      price.custom,
+      result.custom,
       {
         type: { id: '53 45 4c 57 59 4e 2e' },
         fields: {
@@ -135,57 +123,6 @@ test(`CsvParserPrice::processData
         },
       },
       'Price custom fields object is built')
-    t.end()
-  })
-})
-
-test(`CsvParserPrice::processData
-  should process object and build valid price object`, (t) => {
-  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const modifiedPriceSample = priceSample()
-  delete modifiedPriceSample.customType
-  delete modifiedPriceSample.customField
-
-  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
-    Promise.resolve(customTypeSample)
-  )
-
-  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
-    t.ok(result)
-    t.ok(result.sku)
-    t.equal(result.prices.length, 1, 'One price object is built')
-    const price = result.prices[0]
-    t.equal(price.country, 'DE', 'Price country parsed successfully')
-    t.deepEqual(price.value, {
-      currencyCode: 'EUR',
-      centAmount: '4200',
-    }, 'Money object built successfully')
-    t.notOk(price.custom, 'Custom fields obj should not be present')
-    t.end()
-  })
-})
-
-test(`CsvParserPrice::processData
-  should process object and build valid price object
-  if centAmount is not present`, (t) => {
-  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const modifiedPriceSample = priceSample()
-  delete modifiedPriceSample.customType
-  delete modifiedPriceSample.customField
-  delete modifiedPriceSample.value
-
-  sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
-    Promise.resolve(customTypeSample)
-  )
-
-  csvParserPrice.processData(modifiedPriceSample, 2).then((result) => {
-    t.ok(result)
-    t.ok(result.sku)
-    t.equal(result.prices.length, 1, 'One price object is built')
-    const price = result.prices[0]
-    t.equal(price.country, 'DE', 'Price country parsed successfully')
-    t.notOk(price.value)
-    t.notOk(price.custom, 'Custom fields obj should not be present')
     t.end()
   })
 })
@@ -281,23 +218,13 @@ test(`CsvParserPrice::processCustomField
   })
 })
 
-test(`CsvParserPrice::cleanOldData
-  should delete old data if present`, (t) => {
+test(`CsvParserPrice::deleteMovedData
+  should delete leftover data if present`, (t) => {
   const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-  const modifiedPriceSample = priceSample()
-  delete modifiedPriceSample[CONSTANTS.header.sku]
-  const refinedPrice = {
-    sku: modifiedPriceSample[CONSTANTS.header.sku],
-    prices: [modifiedPriceSample],
-  }
-  t.ok(refinedPrice.prices[0].customField, 'customField field is not cleaned')
-  t.ok(refinedPrice.prices[0].customType, 'customType field is not cleaned')
-  const result = csvParserPrice.cleanOldData(refinedPrice)
-  t.notOk(result.prices[0].customType, 'customType field is removed')
-  t.notOk(result.prices[0].customField, 'customField field is removed')
-  t.notOk(
-    result.prices[0][CONSTANTS.header.sku],
-    'variant-sku field is removed'
-  )
+
+  const result = csvParserPrice.deleteMovedData(priceSample())
+
+  t.notOk(result.customField, 'removed customField')
+  t.notOk(result.customType, 'removed customField')
   t.end()
 })
