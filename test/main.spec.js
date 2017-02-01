@@ -46,7 +46,7 @@ describe('CsvParserPrice::parse', () => {
       path.join(__dirname, 'helpers/sample.csv')
     )
 
-    sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
+    sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
       Promise.resolve(customTypeSample)
     )
 
@@ -65,7 +65,7 @@ describe('CsvParserPrice::parse', () => {
       path.join(__dirname, 'helpers/sample.csv')
     )
 
-    sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
+    sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
       Promise.resolve(customTypeSample)
     )
 
@@ -93,7 +93,7 @@ describe('CsvParserPrice::transformPriceData', () => {
   test('should process object and build valid price object', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
-    sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
+    sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
       Promise.resolve(customTypeSample)
     )
 
@@ -148,7 +148,7 @@ describe('CsvParserPrice::processCustomField', () => {
   test('should build custom object', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
-    sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
+    sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
       Promise.resolve(customTypeSample)
     )
 
@@ -178,7 +178,7 @@ describe('CsvParserPrice::processCustomField', () => {
     const modifiedPriceSample = priceSample()
 
     modifiedPriceSample.customField.settype = '1,\'2\',3,4'
-    sinon.stub(csvParserPrice, 'getCustomFieldDefinition').returns(
+    sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
       Promise.resolve(customTypeSample)
     )
 

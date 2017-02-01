@@ -158,7 +158,7 @@ export default class CsvParserPrice {
   processCustomField (data, rowIndex) {
     this.logger.verbose(`Found custom type at row ${rowIndex}`)
 
-    return this.getCustomFieldDefinition(data.customType).then((customType) => {
+    return this.getCustomTypeDefinition(data.customType).then((customType) => {
       this.logger.info(`Got custom type ${customType}`)
 
       const customTypeObj = mapCustomFields.parse(
@@ -172,9 +172,9 @@ export default class CsvParserPrice {
   }
 }
 
-// Easiest way to wrap the getCustomFieldDefinition in the memoize method
-CsvParserPrice.prototype.getCustomFieldDefinition = memoize(
-  function _getCustomFieldDefinition (customTypeKey) {
+// Easiest way to wrap the getCustomTypeDefinition in the memoize method
+CsvParserPrice.prototype.getCustomTypeDefinition = memoize(
+  function _getCustomTypeDefinition (customTypeKey) {
     const getTypeByKeyUri = createRequestBuilder().types
       .where(`key = "${customTypeKey}"`)
       .build({ projectKey: process.env.CT_PROJECT_KEY })

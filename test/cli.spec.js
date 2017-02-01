@@ -111,7 +111,7 @@ test('CLI exits on parsing errors', (done) => {
   )
 })
 
-describe('CLI handles API calls correctly', () => {
+describe.only('CLI handles API calls correctly', () => {
   beforeAll(() => {
     const customTypePayload = {
       key: 'custom-type',
