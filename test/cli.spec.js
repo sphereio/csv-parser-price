@@ -28,7 +28,7 @@ const client = createClient({
   ],
 })
 
-it('CLI help flag', (done) => {
+test('CLI help flag', (done) => {
   exec(`${binPath} --help`, (error, stdout, stderr) => {
     expect(String(stdout).match(/help/)).toBeTruthy()
     expect(error && stderr).toBeFalsy()
@@ -36,7 +36,7 @@ it('CLI help flag', (done) => {
   })
 })
 
-it('CLI version flag', (done) => {
+test('CLI version flag', (done) => {
   exec(`${binPath} --version`, (error, stdout, stderr) => {
     expect(stdout).toBe(`${version}\n`)
     expect(error && stderr).toBeFalsy()
@@ -44,7 +44,7 @@ it('CLI version flag', (done) => {
   })
 })
 
-it('CLI takes input from file', (done) => {
+test('CLI takes input from file', (done) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
 
   exec(`${binPath} -p ${config.projectKey} --inputFile ${csvFilePath}`,
@@ -56,7 +56,7 @@ it('CLI takes input from file', (done) => {
   )
 })
 
-it('CLI writes output to file', (done) => {
+test('CLI writes output to file', (done) => {
   const csvFilePath = './test/helpers/simple-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
@@ -74,14 +74,14 @@ it('CLI writes output to file', (done) => {
   )
 })
 
-it('CLI given a non-existant input file', (done) => {
+test('CLI given a non-existant input file', (done) => {
   exec(`${binPath} -i nope.csv`, (error) => {
     expect(error).toBeTruthy()
     done()
   })
 })
 
-it('CLI exits on faulty CSV format', (done) => {
+test('CLI exits on faulty CSV format', (done) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
@@ -96,7 +96,7 @@ it('CLI exits on faulty CSV format', (done) => {
   )
 })
 
-it('CLI exits on parsing errors', (done) => {
+test('CLI exits on parsing errors', (done) => {
   const csvFilePath = './test/helpers/missing-type-sample.csv'
   const jsonFilePath = tmp.fileSync().name
 
@@ -111,52 +111,55 @@ it('CLI exits on parsing errors', (done) => {
   )
 })
 
-it('CLI exits on type mapping errors', (done) => {
-  const csvFilePath = './test/helpers/sample.csv'
-  const jsonFilePath = tmp.fileSync().name
+describe('CLI handles API calls correctly', () => {
+  beforeAll(() => {
+    const customTypePayload = {
+      key: 'custom-type',
+      name: { nl: 'selwyn' },
+      resourceTypeIds: ['product-price'],
+      fieldDefinitions: [
+        {
+          type: { name: 'Boolean' },
+          name: 'foo',
+          label: { en: 'said the barman' },
+          required: true,
+        },
+      ],
+    }
 
-  const customTypePayload = {
-    key: 'custom-type',
-    name: { nl: 'selwyn' },
-    resourceTypeIds: ['product-price'],
-    fieldDefinitions: [
-      {
-        type: { name: 'Boolean' },
-        name: 'foo',
-        label: { en: 'said the barman' },
-        required: true,
-      },
-    ],
-  }
-
-  // Clean up and create new custom type
-  client.execute({
-    uri: `/${config.projectKey}/types/key=${customTypePayload.key}?version=1`,
-    method: 'DELETE',
-  })
-    // Ignore rejection, we want to create the type either way
-    .catch(() => true)
-    .then(() => client.execute({
-      uri: createRequestBuilder().types.build({
-        projectKey: process.env.CT_PROJECT_KEY,
-      }),
-      body: customTypePayload,
-      method: 'POST',
-    }))
-    .then(() => {
-      // eslint-disable-next-line max-len
-      exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
-        (error, stdout, stderr) => {
-          expect(error.code).toBe(1)
-          expect(stdout).toBeFalsy()
-          expect(stderr.match(/row 2: custom-type.+ valid/)).toBeTruthy()
-          done()
-        }
-      )
+    // Clean up and create new custom type
+    return client.execute({
+      uri: `/${config.projectKey}/types/key=${customTypePayload.key}?version=1`,
+      method: 'DELETE',
     })
+      // Ignore rejection, we want to create the type either way
+      .catch(() => true)
+      .then(() => client.execute({
+        uri: createRequestBuilder().types.build({
+          projectKey: process.env.CT_PROJECT_KEY,
+        }),
+        body: customTypePayload,
+        method: 'POST',
+      }))
+  })
+
+  test('CLI exits on type mapping errors', (done) => {
+    const csvFilePath = './test/helpers/sample.csv'
+    const jsonFilePath = tmp.fileSync().name
+
+    // eslint-disable-next-line max-len
+    exec(`${binPath} -p ${config.projectKey} -i ${csvFilePath} -o ${jsonFilePath}`,
+      (error, stdout, stderr) => {
+        expect(error.code).toBe(1)
+        expect(stdout).toBeFalsy()
+        expect(stderr.match(/row 2: custom-type.+ valid/)).toBeTruthy()
+        done()
+      }
+    )
+  })
 })
 
-it('CLI logs stack trace on verbose level', (done) => {
+test('CLI logs stack trace on verbose level', (done) => {
   const csvFilePath = './test/helpers/faulty-sample.csv'
 
   // eslint-disable-next-line max-len

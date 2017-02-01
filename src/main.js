@@ -40,7 +40,6 @@ export default class CsvParserPrice {
       this.config.strictMode || CONSTANTS.standardOption.strictMode
   }
 
-  // parse :: Stream -> Stream
   parse (input, output) {
     this.logger.info('Starting conversion')
     let rowIndex = 1
@@ -60,7 +59,6 @@ export default class CsvParserPrice {
         this.logger.verbose(`Parsed row ${rowIndex}`)
         rowIndex += 1
       })
-      // Flatten batch of rows to stream
       .flatMap(highland)
       // Unflatten object keys with a dot to nested values
       .map(unflatten)
@@ -80,7 +78,6 @@ export default class CsvParserPrice {
   }
 
   // Transform price values to the type the API expects
-  // transformPriceData :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
   transformPriceData (price) {
     return mapValues(price, (value) => {
@@ -112,7 +109,6 @@ export default class CsvParserPrice {
   }
 
   // Rename for compatibility with price import module
-  // renameHeaders :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
   renameHeaders (price) {
     const newPrice = Object.assign(price)
@@ -130,7 +126,6 @@ export default class CsvParserPrice {
     return newPrice
   }
 
-  // mergeBySku :: (Object, Object) -> Object
   // eslint-disable-next-line class-methods-use-this
   mergeBySku (prices, currentPrice) {
     const previousPrice = prices[prices.length - 1]
@@ -147,7 +142,6 @@ export default class CsvParserPrice {
     return prices
   }
 
-  // deleteMovedData :: Object -> Object
   // eslint-disable-next-line class-methods-use-this
   deleteMovedData (price) {
     const newPrice = Object.assign(price)
@@ -161,7 +155,6 @@ export default class CsvParserPrice {
   }
 
   // Convert custom type value to the expected native type
-  // processCustomField :: (Object, Number) -> Promise -> Object
   processCustomField (data, rowIndex) {
     this.logger.verbose(`Found custom type at row ${rowIndex}`)
 
@@ -180,7 +173,6 @@ export default class CsvParserPrice {
 }
 
 // Easiest way to wrap the getCustomFieldDefinition in the memoize method
-// getCustomFieldDefinition :: Function -> String -> Promise -> Object
 CsvParserPrice.prototype.getCustomFieldDefinition = memoize(
   function _getCustomFieldDefinition (customTypeKey) {
     const getTypeByKeyUri = createRequestBuilder().types
