@@ -1,4 +1,4 @@
-import mapCustomFields from 'map-custom-fields'
+import mapCustomFields from '../src/map-custom-fields'
 
 import customTypeSample from './helpers/custom-type-sample.json'
 
@@ -232,7 +232,7 @@ describe('mapCustomFields::mapSet', () => {
     expect(result.error.length).toBe(4)
     expect(result.error[0]).toEqual(
       // eslint-disable-next-line max-len
-      '\'unsupportedType\' type is not supported! Kindly raise an issue for this'
+      '\'unsupportedType\' type is not supported! Kindly raise an issue for this',
     )
   })
 

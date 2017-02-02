@@ -7,6 +7,7 @@ import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
 import { exec } from 'child_process'
 import fs from 'fs'
 import tmp from 'tmp'
+import CONSTANTS from '../src/constants'
 import { version } from '../package.json'
 
 
@@ -14,6 +15,7 @@ const binPath = './bin/csvparserprice.js'
 
 // TODO: replace with package call
 const config = {
+  host: CONSTANTS.host.auth,
   projectKey: process.env.CT_PROJECT_KEY,
   credentials: {
     clientId: process.env.CT_CLIENT_ID,
@@ -24,7 +26,9 @@ const config = {
 const client = createClient({
   middlewares: [
     createAuthMiddlewareForClientCredentialsFlow(config),
-    createHttpMiddleware(),
+    createHttpMiddleware({
+      host: CONSTANTS.host.api,
+    }),
   ],
 })
 
@@ -52,7 +56,7 @@ test('CLI takes input from file', (done) => {
       expect(stdout.match(/prices/)).toBeTruthy()
       expect(error && stderr).toBeFalsy()
       done()
-    }
+    },
   )
 })
 
@@ -70,7 +74,7 @@ test('CLI writes output to file', (done) => {
         expect(error).toBeFalsy()
         done()
       })
-    }
+    },
   )
 })
 
@@ -92,7 +96,7 @@ test('CLI exits on faulty CSV format', (done) => {
       expect(stdout).toBeFalsy()
       expect(stderr.match(/Row length does not match headers/)).toBeTruthy()
       done()
-    }
+    },
   )
 })
 
@@ -107,11 +111,11 @@ test('CLI exits on parsing errors', (done) => {
       expect(stdout).toBeFalsy()
       expect(stderr.match(/No type with key .+ found/)).toBeTruthy()
       done()
-    }
+    },
   )
 })
 
-describe.only('CLI handles API calls correctly', () => {
+describe('CLI handles API calls correctly', () => {
   beforeAll(() => {
     const customTypePayload = {
       key: 'custom-type',
@@ -154,7 +158,7 @@ describe.only('CLI handles API calls correctly', () => {
         expect(stdout).toBeFalsy()
         expect(stderr.match(/row 2: custom-type.+ valid/)).toBeTruthy()
         done()
-      }
+      },
     )
   })
 })
@@ -169,6 +173,6 @@ test('CLI logs stack trace on verbose level', (done) => {
       expect(stdout).toBeFalsy()
       expect(stderr.match(/\.js:\d+:\d+/)).toBeTruthy()
       done()
-    }
+    },
   )
 })

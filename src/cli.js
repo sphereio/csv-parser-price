@@ -13,7 +13,7 @@ const args = yargs
   .usage(
     `\n
 Usage: $0 [options]
-Convert commercetools price CSV data to JSON.`
+Convert commercetools price CSV data to JSON.`,
   )
   .showHelpOnFail(false)
 
@@ -123,6 +123,8 @@ const errorHandler = (errors) => {
 // TODO: where is the accessToken gone?
 const csvParserPrice = new CsvParserPrice(
   {
+    // TODO: make this an option
+    host: CONSTANTS.host.auth,
     projectKey: args.projectKey,
     credentials: {
       clientId: process.env.CT_CLIENT_ID,
@@ -137,7 +139,7 @@ const csvParserPrice = new CsvParserPrice(
   },
   {
     delimiter: args.delimiter,
-  }
+  },
 )
 
 csvParserPrice.parse(args.inputFile, args.outputFile)

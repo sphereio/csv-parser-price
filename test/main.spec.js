@@ -1,10 +1,10 @@
-import CsvParserPrice from 'main'
 import fs from 'fs'
 import path from 'path'
 import sinon from 'sinon'
 import StreamTest from 'streamtest'
 
 import CONSTANTS from '../src/constants'
+import CsvParserPrice from '../src/main'
 import priceSample from './helpers/price-sample'
 import customTypeSample from './helpers/custom-type-sample.json'
 
@@ -43,11 +43,11 @@ describe('CsvParserPrice::parse', () => {
   test('should accept a stream and output a stream', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig)
     const readStream = fs.createReadStream(
-      path.join(__dirname, 'helpers/sample.csv')
+      path.join(__dirname, 'helpers/sample.csv'),
     )
 
     sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-      Promise.resolve(customTypeSample)
+      Promise.resolve(customTypeSample),
     )
 
     const outputStream = StreamTest['v2'].toText((error, result) => {
@@ -62,11 +62,11 @@ describe('CsvParserPrice::parse', () => {
   test('should group prices by variants sku', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
     const readStream = fs.createReadStream(
-      path.join(__dirname, 'helpers/sample.csv')
+      path.join(__dirname, 'helpers/sample.csv'),
     )
 
     sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-      Promise.resolve(customTypeSample)
+      Promise.resolve(customTypeSample),
     )
 
     const outputStream = StreamTest['v2'].toText((error, result) => {
@@ -94,7 +94,7 @@ describe('CsvParserPrice::transformPriceData', () => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
     sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-      Promise.resolve(customTypeSample)
+      Promise.resolve(customTypeSample),
     )
 
     csvParserPrice.transformCustomData(priceSample(), 2).then((result) => {
@@ -149,7 +149,7 @@ describe('CsvParserPrice::processCustomField', () => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
     sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-      Promise.resolve(customTypeSample)
+      Promise.resolve(customTypeSample),
     )
 
     csvParserPrice.processCustomField(priceSample(), 2).then((result) => {
@@ -179,19 +179,40 @@ describe('CsvParserPrice::processCustomField', () => {
 
     modifiedPriceSample.customField.settype = '1,\'2\',3,4'
     sinon.stub(csvParserPrice, 'getCustomTypeDefinition').returns(
-      Promise.resolve(customTypeSample)
+      Promise.resolve(customTypeSample),
     )
 
-    csvParserPrice.processCustomField(modifiedPriceSample, 2).then((result) => {
-      done.fail()
-      expect(result).toBeFalsy()
-      done()
-    }, (error) => {
-      expect(error.length).toBe(1)
-      expect(error[0].message)
-      .toBe('[row 2: liqui 63 69 ty] - The number \'2\' isn\'t valid')
-      done()
-    })
+    csvParserPrice.processCustomField(modifiedPriceSample, 2)
+      .then((result) => {
+        done.fail()
+        expect(result).toBeFalsy()
+        done()
+      })
+      .catch((error) => {
+        expect(error.length).toBe(1)
+        expect(error[0].message)
+          .toBe('[row 2: liqui 63 69 ty] - The number \'2\' isn\'t valid')
+        done()
+      })
+  })
+})
+
+describe('CsvParserPrice::getCustomTypeDefinition', () => {
+  test('should reject when no type with given key exists', (done) => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+
+    // TODO: mock this.client.execute
+
+    csvParserPrice.getCustomTypeDefinition('(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧')
+      .then(done.fail)
+      // TODO: test against result
+      .catch(done)
+
+    expect(true).toBe(true)
+  })
+
+  test('should resolve to type definition', (done) => {
+    done()
   })
 })
 

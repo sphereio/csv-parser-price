@@ -1,4 +1,9 @@
 const CONSTANTS = {
+  host: {
+    api: 'https://api.sphere.io',
+    auth: 'https://auth.sphere.io',
+  },
+
   field: {
     integer: new RegExp(/^-?\d+$/),
     money: new RegExp(/^([A-Z]{3}) (-?\d+)$/),

@@ -20,7 +20,9 @@ export default class CsvParserPrice {
     this.client = createClient({
       middlewares: [
         createAuthMiddlewareForClientCredentialsFlow(apiClientCredentials),
-        createHttpMiddleware(),
+        createHttpMiddleware({
+          host: CONSTANTS.host.api,
+        }),
       ],
     })
 
@@ -162,7 +164,7 @@ export default class CsvParserPrice {
       this.logger.info(`Got custom type ${customType}`)
 
       const customTypeObj = mapCustomFields.parse(
-        data.customField, customType, rowIndex
+        data.customField, customType, rowIndex,
       )
       if (customTypeObj.error.length)
         return Promise.reject(customTypeObj.error)
@@ -186,10 +188,10 @@ CsvParserPrice.prototype.getCustomTypeDefinition = memoize(
       .then((response) => {
         if (response.body.count === 0)
           return Promise.reject(
-            new Error(`No type with key '${customTypeKey}' found`)
+            new Error(`No type with key '${customTypeKey}' found`),
           )
 
         return response.body.results[0]
       })
-  }
+  },
 )

@@ -46,7 +46,7 @@ export default (function MapCustomFields () {
               const _result = this.mapNumber(value)
               if (_result.error)
                 result.error.push(
-                    processError(_result.error, rowIndex, customType.key)
+                    processError(_result.error, rowIndex, customType.key),
                   )
               if (!(_result.data === undefined))
                 custom.fields[key] = _result.data
@@ -56,7 +56,7 @@ export default (function MapCustomFields () {
               const _result = this.mapBoolean(value)
               if (_result.error)
                 result.error.push(
-                    processError(_result.error, rowIndex, customType.key)
+                    processError(_result.error, rowIndex, customType.key),
                   )
               if (!(_result.data === undefined))
                 custom.fields[key] = _result.data
@@ -66,7 +66,7 @@ export default (function MapCustomFields () {
               const _result = this.mapMoney(value)
               if (_result.error)
                 result.error.push(
-                    processError(_result.error, rowIndex, customType.key)
+                    processError(_result.error, rowIndex, customType.key),
                   )
               if (!(_result.data === undefined))
                 custom.fields[key] = _result.data
@@ -76,7 +76,7 @@ export default (function MapCustomFields () {
               const _result = this.mapSet(value, fieldDef.type.elementType)
               if (_result.error.length)
                 result.error.push(
-                    ...processError(_result.error, rowIndex, customType.key)
+                    ...processError(_result.error, rowIndex, customType.key),
                   )
               if (_result.data.length)
                 custom.fields[key] = _result.data
@@ -100,8 +100,8 @@ export default (function MapCustomFields () {
                 }' type is not supported! Kindly raise an issue for this`
               result.error.push(
                   new Error(
-                    `[row ${rowIndex}: ${customType.key}] - ${unsupportedMsg}`
-                  )
+                    `[row ${rowIndex}: ${customType.key}] - ${unsupportedMsg}`,
+                  ),
                 )
             }
           }
