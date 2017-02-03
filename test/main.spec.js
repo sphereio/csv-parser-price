@@ -89,7 +89,9 @@ describe('CsvParserPrice::transformPriceData', () => {
 
     expect(result.value.centAmount).toBe(4200)
   })
+})
 
+describe('CsvParserPrice::transformCustomData', () => {
   test('should process object and build valid price object', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
@@ -112,6 +114,20 @@ describe('CsvParserPrice::transformPriceData', () => {
       done()
     })
   })
+// ///////////////////////
+/*
+  test('should do nothing if price.customType is undefined', (done) =>{
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+    sinon.stub(csvParserPrice, 'processCustomField').returns(
+      Promise.rej()
+    )
+
+    const result = csvParserPrice.transformCustomData(null)
+
+    expect(result).toBe(null)
+  })
+/////////////////////////
+*/
 })
 
 describe('CsvParserPrice::renameHeaders', () => {
@@ -201,18 +217,40 @@ describe('CsvParserPrice::getCustomTypeDefinition', () => {
   test('should reject when no type with given key exists', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
-    // TODO: mock this.client.execute
+    sinon.stub(csvParserPrice.client, 'execute').returns(
+      Promise.resolve({
+        body: { count: 0 },
+      }),
+    )
 
     csvParserPrice.getCustomTypeDefinition('(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧')
       .then(done.fail)
-      // TODO: test against result
-      .catch(done)
-
-    expect(true).toBe(true)
+      .catch((error) => {
+        expect(error.message).toBe('No type with key \'(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧\' found')
+        done()
+      })
   })
 
-  test('should resolve to type definition', (done) => {
-    done()
+  test('should resolve to type definition when given key exists', (done) => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+
+    sinon.stub(csvParserPrice.client, 'execute').returns(
+      Promise.resolve({
+        body: {
+          count: 1,
+          results: ['Welcome'],
+        },
+      }),
+    )
+
+    csvParserPrice.getCustomTypeDefinition('williams-ct')
+      .then((result) => {
+        expect(result).toBe('Welcome')
+        done()
+      })
+      .catch(() => {
+        done.fail('Type doesn\'t exist')
+      })
   })
 })
 
