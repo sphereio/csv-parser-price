@@ -114,20 +114,17 @@ describe('CsvParserPrice::transformCustomData', () => {
       done()
     })
   })
-// ///////////////////////
-/*
-  test('should do nothing if price.customType is undefined', (done) =>{
+
+  test('should return input when there is no price.customType', (done) => {
     const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
-    sinon.stub(csvParserPrice, 'processCustomField').returns(
-      Promise.rej()
-    )
 
-    const result = csvParserPrice.transformCustomData(null)
-
-    expect(result).toBe(null)
+    csvParserPrice.transformCustomData({ a: true })
+      .then((result) => {
+        expect(result).toEqual({ a: true })
+        done()
+      })
+      .catch(done.fail)
   })
-/////////////////////////
-*/
 })
 
 describe('CsvParserPrice::renameHeaders', () => {
