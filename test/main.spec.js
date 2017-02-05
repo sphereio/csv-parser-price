@@ -155,6 +155,15 @@ describe('CsvParserPrice::renameHeaders', () => {
     expect(result.channel.key).toBeFalsy()
     expect(result.channel.id).toBe('my-channel')
   })
+
+  test(`should return input if no price.customerGroup
+      or price.customerGroup.groupName and price.channel or
+      price.channel.key`, () => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+
+    const result = csvParserPrice.renameHeaders({ foo: 'bar' })
+    expect(result).toEqual({ foo: 'bar' })
+  })
 })
 
 describe('CsvParserPrice::processCustomField', () => {
@@ -240,7 +249,7 @@ describe('CsvParserPrice::getCustomTypeDefinition', () => {
       }),
     )
 
-    csvParserPrice.getCustomTypeDefinition('williams-ct')
+    csvParserPrice.getCustomTypeDefinition(apiClientConfig.projectKey)
       .then((result) => {
         expect(result).toBe('Welcome')
         done()
@@ -251,12 +260,20 @@ describe('CsvParserPrice::getCustomTypeDefinition', () => {
   })
 })
 
-test(`CsvParserPrice::deleteMovedData
-  should delete leftover data if present`, () => {
-  const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+describe('CsvParserPrice::deleteMovedData', () => {
+  test('should delete leftover data if present', () => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
 
-  const result = csvParserPrice.deleteMovedData(priceSample())
+    const result = csvParserPrice.deleteMovedData(priceSample())
 
-  expect(result.customField).toBeFalsy()
-  expect(result.customType).toBeFalsy()
+    expect(result.customField).toBeFalsy()
+    expect(result.customType).toBeFalsy()
+  })
+
+  test('should return input if leftover data absent', () => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+
+    const result = csvParserPrice.deleteMovedData({ foo: 'bar' })
+    expect(result).toEqual({ foo: 'bar' })
+  })
 })
