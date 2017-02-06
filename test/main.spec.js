@@ -79,6 +79,44 @@ describe('CsvParserPrice::parse', () => {
     })
     csvParserPrice.parse(readStream, outputStream)
   })
+
+  test('should exit on faulty CSV format', (done) => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+    const inputStream = fs.createReadStream(
+      path.join(__dirname, 'helpers/faulty-sample.csv'),
+    )
+    const spy = sinon.spy(csvParserPrice.logger, 'error')
+
+    const outputStream = StreamTest['v2'].toText(() => {
+      const errorString = spy.args[0][0].toString()
+      expect(spy.called).toBeTruthy()
+      expect(spy.calledOnce).toBeTruthy()
+      expect(errorString.includes('Row length does not match headers'))
+        .toBeTruthy()
+      csvParserPrice.logger.error.restore()
+      done()
+    })
+    csvParserPrice.parse(inputStream, outputStream)
+  })
+
+  test('should exit on CSV parsing error', (done) => {
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
+    const inputStream = fs.createReadStream(
+      path.join(__dirname, 'helpers/missing-type-sample.csv'),
+    )
+    const spy = sinon.spy(csvParserPrice.logger, 'error')
+
+    const outputStream = StreamTest['v2'].toText(() => {
+      const errorString = spy.args[0][0].toString()
+      expect(spy.called).toBeTruthy()
+      expect(spy.calledOnce).toBeTruthy()
+      expect(errorString.includes('Missing required option'))
+        .toBeTruthy()
+      csvParserPrice.logger.error.restore()
+      done()
+    })
+    csvParserPrice.parse(inputStream, outputStream)
+  })
 })
 
 
