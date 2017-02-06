@@ -41,7 +41,7 @@ test(`CsvParserPrice
 
 describe('CsvParserPrice::parse', () => {
   test('should accept a stream and output a stream', (done) => {
-    const csvParserPrice = new CsvParserPrice(apiClientConfig)
+    const csvParserPrice = new CsvParserPrice(apiClientConfig, logger)
     const readStream = fs.createReadStream(
       path.join(__dirname, 'helpers/sample.csv'),
     )
@@ -85,14 +85,13 @@ describe('CsvParserPrice::parse', () => {
     const inputStream = fs.createReadStream(
       path.join(__dirname, 'helpers/faulty-sample.csv'),
     )
+
     const spy = sinon.spy(csvParserPrice.logger, 'error')
 
     const outputStream = StreamTest['v2'].toText(() => {
       const errorString = spy.args[0][0].toString()
-      expect(spy.called).toBeTruthy()
       expect(spy.calledOnce).toBeTruthy()
-      expect(errorString.includes('Row length does not match headers'))
-        .toBeTruthy()
+      expect(errorString).toMatch('Row length does not match headers')
       csvParserPrice.logger.error.restore()
       done()
     })
@@ -104,14 +103,13 @@ describe('CsvParserPrice::parse', () => {
     const inputStream = fs.createReadStream(
       path.join(__dirname, 'helpers/missing-type-sample.csv'),
     )
+
     const spy = sinon.spy(csvParserPrice.logger, 'error')
 
     const outputStream = StreamTest['v2'].toText(() => {
       const errorString = spy.args[0][0].toString()
-      expect(spy.called).toBeTruthy()
       expect(spy.calledOnce).toBeTruthy()
-      expect(errorString.includes('Missing required option'))
-        .toBeTruthy()
+      expect(errorString).toMatch('Missing required option')
       csvParserPrice.logger.error.restore()
       done()
     })
@@ -287,7 +285,7 @@ describe('CsvParserPrice::getCustomTypeDefinition', () => {
       }),
     )
 
-    csvParserPrice.getCustomTypeDefinition(apiClientConfig.projectKey)
+    csvParserPrice.getCustomTypeDefinition()
       .then((result) => {
         expect(result).toBe('Welcome')
         done()

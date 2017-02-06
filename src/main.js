@@ -113,7 +113,7 @@ export default class CsvParserPrice {
   // Rename for compatibility with price import module
   // eslint-disable-next-line class-methods-use-this
   renameHeaders (price) {
-    const newPrice = Object.assign(price)
+    const newPrice = { ...price }
 
     if (newPrice.customerGroup && newPrice.customerGroup.groupName) {
       newPrice.customerGroup.id = newPrice.customerGroup.groupName
@@ -146,7 +146,7 @@ export default class CsvParserPrice {
 
   // eslint-disable-next-line class-methods-use-this
   deleteMovedData (price) {
-    const newPrice = Object.assign(price)
+    const newPrice = { ...price }
 
     if (newPrice.customField)
       delete newPrice.customField
