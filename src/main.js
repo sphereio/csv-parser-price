@@ -11,15 +11,22 @@ import { createAuthMiddlewareForClientCredentialsFlow }
 import { createClient } from '@commercetools/sdk-client'
 import { createHttpMiddleware } from '@commercetools/sdk-middleware-http'
 import { createRequestBuilder } from '@commercetools/api-request-builder'
+import { createUserAgentMiddleware }
+  from '@commercetools/sdk-middleware-user-agent'
 
 import CONSTANTS from './constants'
 import mapCustomFields from './map-custom-fields'
+import { version } from '../package.json'
 
 export default class CsvParserPrice {
   constructor (apiClientCredentials, logger, config = {}) {
     this.client = createClient({
       middlewares: [
         createAuthMiddlewareForClientCredentialsFlow(apiClientCredentials),
+        createUserAgentMiddleware({
+          libraryName: 'csv-parser-price',
+          libraryVersion: version,
+        }),
         createHttpMiddleware({
           host: CONSTANTS.host.api,
         }),
