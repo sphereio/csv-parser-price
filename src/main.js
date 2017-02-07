@@ -44,7 +44,7 @@ export default class CsvParserPrice {
 
   parse (input, output) {
     this.logger.info('Starting conversion')
-    let rowIndex = 1
+    let rowIndex = 2
 
     highland(input)
       // Parse CSV return each row as object
@@ -57,10 +57,6 @@ export default class CsvParserPrice {
       // Limit amount of rows to be handled at the same time
       .batch(this.batchSize)
       .stopOnError(error => this.logger.error(error))
-      .doto(() => {
-        this.logger.verbose(`Parsed row ${rowIndex}`)
-        rowIndex += 1
-      })
       .flatMap(highland)
       // Unflatten object keys with a dot to nested values
       .map(unflatten)
@@ -68,7 +64,10 @@ export default class CsvParserPrice {
       .map(this.renameHeaders)
       .flatMap(data => highland(this.transformCustomData(data, rowIndex)))
       .map(this.deleteMovedData)
-      .doto(() => this.logger.verbose(`Converted row ${rowIndex}`))
+      .doto(() => {
+        this.logger.verbose(`Processed row ${rowIndex}`)
+        rowIndex += 1
+      })
       .stopOnError(error => this.logger.error(error))
       .reduce([], this.mergeBySku)
       .doto((data) => {
@@ -94,7 +93,9 @@ export default class CsvParserPrice {
 
   transformCustomData (price, rowIndex) {
     if (price.customType) {
-      this.logger.verbose('Found custom type')
+      this.logger.verbose(
+        `Found custom type ${price.customType}, row ${rowIndex}`,
+      )
 
       return this.processCustomField(price, rowIndex)
         // Using arrow without body trips up babel transform-object-rest-spread
@@ -158,10 +159,8 @@ export default class CsvParserPrice {
 
   // Convert custom type value to the expected native type
   processCustomField (data, rowIndex) {
-    this.logger.verbose(`Found custom type at row ${rowIndex}`)
-
     return this.getCustomTypeDefinition(data.customType).then((customType) => {
-      this.logger.info(`Got custom type ${customType}`)
+      this.logger.info(`Fetched custom type ${customType.key} definition`)
 
       const customTypeObj = mapCustomFields.parse(
         data.customField, customType, rowIndex,

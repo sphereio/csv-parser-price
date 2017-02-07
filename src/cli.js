@@ -99,16 +99,13 @@ Convert commercetools price CSV data to JSON.`,
 
 const logError = (error) => {
   const errorFormatter = new PrettyError()
-  let formattedError
 
   if (npmlog.level === 'verbose')
-    formattedError = errorFormatter.render(error)
+    process.stderr.write(errorFormatter.render(error))
   else
-    formattedError = error.message
+    npmlog.error('', error.message)
 
-  process.stderr.write(formattedError)
   process.stderr.write('\n')
-  npmlog.error('', formattedError)
 }
 
 const errorHandler = (errors) => {

@@ -109,7 +109,7 @@ test('CLI exits on parsing errors', (done) => {
     (error, stdout, stderr) => {
       expect(error.code).toBe(1)
       expect(stdout).toBeFalsy()
-      expect(stderr.match(/No type with key .+ found/)).toBeTruthy()
+      expect(stderr).toMatch(/No type with key .+ found/)
       done()
     },
   )
@@ -156,7 +156,7 @@ describe('CLI handles API calls correctly', () => {
       (error, stdout, stderr) => {
         expect(error.code).toBe(1)
         expect(stdout).toBeFalsy()
-        expect(stderr.match(/row 2: custom-type.+ valid/)).toBeTruthy()
+        expect(stderr).toMatch(/row 2: custom-type.+ valid/)
         done()
       },
     )
@@ -171,7 +171,7 @@ test('CLI logs stack trace on verbose level', (done) => {
     (error, stdout, stderr) => {
       expect(error.code).toBe(1)
       expect(stdout).toBeFalsy()
-      expect(stderr.match(/\.js:\d+:\d+/)).toBeTruthy()
+      expect(stderr).toMatch(/\.js:\d+:\d+/)
       done()
     },
   )
